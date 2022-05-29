@@ -1,0 +1,13 @@
+<package>
+  <description brief="spot">
+
+     spot environment for experimenting and working on the assignment.
+
+  </description>
+  <author>Luke Mason</author>
+  <author>Andrew Davey</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/spot</url>
+
+</package>
