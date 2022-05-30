@@ -15,7 +15,7 @@ You will get a series of instructions that you will have to follow to add lines 
 # Run the following command, make sure that the installation completes successfully, if it throws errors you might have to install additional packages
 pyenv install 3.6.13
 
-# Run the following commands and make sure the python version is 3.6
+# Run the following commands and make sure that the python version that is default on your system is now 3.6
 pyenv global 3.6.13
 pyenv local 3.6.13
 pip install virtualenv
