@@ -1,0 +1,45 @@
+# Install the following packages: 
+sudo apt-get install git
+sudo apt-get install build-essential
+sudo apt-get install zlib1g-dev
+sudo apt-get install libssl-dev
+sudo apt-get install libreadline-dev
+
+# Run the following command
+curl https://pyenv.run | bash
+
+#----------------------------------------------------------------------------
+You will get a series of instructions that you will have to follow to add lines to ./bash.rc and ./profile.rc or something like that, follow them properly otherwise this won't work
+#----------------------------------------------------------------------------
+
+# Run the following command, make sure that the installation completes successfully, if it throws errors you might have to install additional packages
+pyenv install 3.6.13
+
+# Run the following commands and make sure that the python version that is default on your system is now 3.6
+pyenv global 3.6.13
+pyenv local 3.6.13
+pip install virtualenv
+virtualenv venv_ok
+
+
+# After that is done, follow the instructions here to install ros-noetic
+http://wiki.ros.org/noetic/Installation/Ubuntu
+
+
+# Create a new workspace folder, call it whatever you want, mine's called spot-ws
+mkdir spot-ws 
+cd spot-ws
+mkdir src
+cd src
+
+# Clone our github repo into the src folder if you havent already
+git clone https://github.com/Luke-Mason/SPOT.git
+
+
+# Try to get catkin_make working. You might run into a few errors, try the following commands first: 
+pip install empy
+pip3 install catkin_pkg
+sudo apt-get install python3-catkin-pkg
+
+# Install packages / dependencies for the SPOT-sdk
+https://github.com/boston-dynamics/spot-sdk/blob/master/docs/python/quickstart.md
