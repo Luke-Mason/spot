@@ -17,8 +17,8 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 class YOLO(object):
     # TODO fix paths
     def __init__(self, **kwargs):
-        self.model_path = "../create/yolov3.h5"
-        self.anchors_path = "../config_files/yolo_anchors.txt"
+        self.model_path = "../../../resources/yolov3.h5"
+        self.anchors_path = "../../../config/custom/vision/YOLO/yolo_anchors.txt"
         self.classes_path = "../config_files/all_classes.txt"
         self.score = 0.3
         self.iou = 0.45
