@@ -1,14 +1,12 @@
 from dataclasses import dataclass
-import string
-from aiil_workspace.noetic_workspace.src.SPOT.nodes.audio.knowledgebase.NamedLocation import NamedLocation
-from aiil_workspace.noetic_workspace.src.SPOT.nodes.audio.knowledgebase.Target import Target
-from aiil_workspace.noetic_workspace.src.SPOT.nodes.audio.knowledgebase.Task import Task
-from std_msgs.msg import String
+from nodes.audio.knowledgebase.Location import Location
+from audio.knowledgebase.Target import Target
+from audio.knowledgebase.Task import Task
 
 
 @dataclass
 class Command():
-  def __init__(self, task: Task = None, target: Target = None, location: NamedLocation = None):
+  def __init__(self, task: Task = None, target: Target = None, location: Location = None):
     self.task = task
     self.target = target
     self.location = location

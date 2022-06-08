@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 import time
-
 import numpy as np
-from AudioClip import AudioClip
-from Listen import Listen, ListenerStatus
 import message_filters
+from nodes.audio.msg.AudioClip import AudioClip
+from nodes.audio.msg.Listen import Listen, ListenerStatus
 import rospy
 import sounddevice as sd
 
@@ -13,6 +12,7 @@ import sounddevice as sd
 class AudioListenerNode():
 
   def __init__(self):
+    fs = rospy.get_param("~samplerate", 16000) 
 
 
     # Initialise listening state is a listening duration just for the awake command.
@@ -25,7 +25,6 @@ class AudioListenerNode():
     # Publishers
     self.audio_pub = rospy.Publisher('/audio', AudioClip, queue_size=2)
 
-    fs=16000
     prev_sound_data = []
 
     while not rospy.is_shutdown:
@@ -53,7 +52,7 @@ if __name__ == '__main__':
   # Wait for ROS to start.
   time.sleep(1)
 
-  rospy.init_node("Audio Listener Node", log_level=rospy.INFO)
-  rospy.loginfo("STARTING AUDIO LISTENER NODE")
+  rospy.init_node("Audio Listener", log_level=rospy.INFO)
+  rospy.loginfo("STARTING AUDIO LISTENER")
   audio = AudioListenerNode()
   rospy.spin()

@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import time
-import numpy as np
-from Command import Command
-from Listen import Listen, ListenerStatus
-import message_filters
+from audio.knowledgebase.Knowledge import KnownTasks
+from voice.knowledgebase.Knowledge import Sayings
+from voice.msg.Say import Say
 import rospy
-from std_msgs.msg import String, Int16
+import message_filters
+from audio.msg.Listen import Listen, ListenerStatus
+from audio.msg.Command import Command
+from std_msgs.msg import String
 
 
 class TextInterpreter():
@@ -27,18 +29,22 @@ class TextInterpreter():
     # Publishers
     self.command_pub = rospy.Publisher('/command', Command, queue_size=2)
     self.response_pub = rospy.Publisher('/response', String, queue_size=2)
-    self.say_pub = rospy.Publisher('/say', String, queue_size=2)
+    self.say_pub = rospy.Publisher('/say', Say, queue_size=2)
 
   def interpret(self, translation: String):
+    
     # Check if it is the awake command
-    if translation == KnownTasks.awake_call:
+    if KnownTasks.awake_call in translation:
+      self.say_pub.publish(Sayings.im_listening)
+      return
 
+    # See if there is a task in the audio fragment
+    # for task in KnownTasks.all_known_tasks:
+    #   try:
+    #     move_command_index = translation.index(task)
 
-    try:
-      move_command_index = translation.index(find)
-
-    except ValueError:
-      pass
+    #   except ValueError:
+    #     pass
 
   def set_listen(self, listener_status: Listen):
         self.listener_status = listener_status
@@ -50,7 +56,7 @@ if __name__ == '__main__':
   # Wait for ROS to start.
   time.sleep(1)
 
-  rospy.init_node("Audio Listener Node", log_level=rospy.INFO)
-  rospy.loginfo("STARTING AUDIO NODE")
-  audio = AudioNode()
+  rospy.init_node("Audio Text Interpreter", log_level=rospy.INFO)
+  rospy.loginfo("STARTING TEXT INTERPRETER")
+  audio = TextInterpreter()
   rospy.spin()
