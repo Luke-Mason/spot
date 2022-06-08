@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="SPOT" name="audio listener" type="audioListener.py" output="screen"/>
+    <node pkg="SPOT" name="translate audio" type="audioTranslator.py" output="screen"/>
+    <node pkg="SPOT" name="interpret text" type="textInterpreter.py" output="screen"/>
+
+</launch>

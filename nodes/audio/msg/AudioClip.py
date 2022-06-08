@@ -3,5 +3,5 @@ from dataclasses import dataclass
 
 @dataclass
 class AudioClip():
-    hz: int
+    hz: int # sample rate
     data: object
