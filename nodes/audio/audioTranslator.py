@@ -2,8 +2,8 @@
 
 import time
 import message_filters
-from audio.msg.AudioClip import AudioClip
-from audio.msg.Listen import Listen, ListenerStatus
+from nodes.audio.msg.AudioClip import AudioClip
+from nodes.audio.msg.Listen import ListenerStatus, Listen
 import rospy
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Tokenizer
 import torch
@@ -36,7 +36,7 @@ class AudioTranslator():
     transcription = self.tokenizer.batch_decode(predicted_ids)[0]
     
     self.translation_pub.publish(transcription)
-    
+
     print(transcription)
     rospy.loginfo(transcription)
 

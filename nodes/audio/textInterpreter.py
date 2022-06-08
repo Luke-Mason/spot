@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import time
-from audio.knowledgebase.Knowledge import KnownTasks
+from nodes.audio.knowledgebase.Knowledge import KnownTasks
 from voice.knowledgebase.Knowledge import Sayings
 from voice.msg.Say import Say
 import rospy
