@@ -46,9 +46,7 @@ class AudioListenerNode():
         self.listener_status = listen_type
 
 
-
-
-if __name__ == '__main__':
+def main():
   # Wait for ROS to start.
   time.sleep(1)
 

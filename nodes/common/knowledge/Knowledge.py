@@ -1,6 +1,5 @@
-from nodes.audio.knowledgebase.Location import Location
-from audio.knowledgebase.Task import Task
-
+import string
+from knowledge.msg.Say import Say
 
 # LOCATIONS
 class KnownLocations():
@@ -18,8 +17,6 @@ class KnownTargets():
     
     all_known_targets = [luke]
 
-
-
 # TASKS
 class KnownTasks():
     # Move task
@@ -33,3 +30,26 @@ class KnownTasks():
     
     awake_call = "HEY SPOT"
 
+class Sayings():
+    im_listening = Say("yes? uhuh? what is it?")
+
+
+class Location():
+  def __init__(self, id: string, aliases) -> None:
+      self.id = id
+      self.aliases = aliases
+
+class Target():
+    def __init__(self, name: string) -> None:
+        self.name = name
+    
+    def get_name(self):
+        return self.name
+
+
+class Task():
+    def __init__(self, name: string) -> None:
+        self.name = name
+    
+    def get_name(self):
+        return self.name

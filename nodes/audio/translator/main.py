@@ -2,8 +2,6 @@
 
 import time
 import message_filters
-from nodes.audio.msg.AudioClip import AudioClip
-from nodes.audio.msg.Listen import ListenerStatus, Listen
 import rospy
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Tokenizer
 import torch
@@ -44,7 +42,7 @@ class AudioTranslator():
         self.listener_status = listen_type
 
 
-if __name__ == '__main__':
+def main():
   # Wait for ROS to start.
   time.sleep(1)
 

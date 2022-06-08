@@ -2,8 +2,8 @@
 
 import time
 from nodes.audio.knowledgebase.Knowledge import KnownTasks
-from voice.knowledgebase.Knowledge import Sayings
-from voice.msg.Say import Say
+from nodes.voice.knowledgebase.Knowledge import Sayings
+from noetic_workspace.src.SPOT.nodes.msg.Say import Say
 import rospy
 import message_filters
 from audio.msg.Listen import Listen, ListenerStatus
@@ -52,7 +52,7 @@ class TextInterpreter():
 
 
 
-if __name__ == '__main__':
+def main():
   # Wait for ROS to start.
   time.sleep(1)
 
