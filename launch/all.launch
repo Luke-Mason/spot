@@ -8,5 +8,4 @@
 
     <!-- Launch Audio Interpretation -->
     <include file="$(find SPOT)/launch/audio.launch" />
-
 </launch>

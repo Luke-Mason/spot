@@ -7,6 +7,7 @@ from audio.msg.Listen import Listen, ListenerStatus
 import rospy
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Tokenizer
 import torch
+from std_msgs.msg import String
 
 
 class AudioTranslator():
@@ -21,17 +22,23 @@ class AudioTranslator():
     # Subscribers
     listen_sub = message_filters.Subscriber('listen', Listen)
     listen_sub.registerCallback(self.set_listen)
-    
-    # Publishers
-    command_sub = message_filters.Subscriber('/audio', AudioClip)
-    command_sub.registerCallback(self.translate)
+    audio_sub = message_filters.Subscriber('/audio', AudioClip)
+    audio_sub.registerCallback(self.translate)
+
+    # Publishes translation
+    self.translation_pub = rospy.Publisher('/translation', String, queue_size=2)
+
 
   def translate(self, audioClip: AudioClip):
     input_values = self.tokenizer(audioClip.data, return_tensors="pt").input_values
     logits = self.model(input_values).logits
     predicted_ids = torch.argmax(logits, dim=-1)
     transcription = self.tokenizer.batch_decode(predicted_ids)[0]
+    
+    self.translation_pub.publish(transcription)
+    
     print(transcription)
+    rospy.loginfo(transcription)
 
   def set_listen(self, listen_type: Listen):
         self.listener_status = listen_type

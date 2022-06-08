@@ -3,8 +3,8 @@
 import time
 import numpy as np
 import message_filters
-from nodes.audio.msg.AudioClip import AudioClip
-from nodes.audio.msg.Listen import Listen, ListenerStatus
+from .audio.msg.AudioClip import AudioClip
+from .audio.msg.Listen import Listen, ListenerStatus
 import rospy
 import sounddevice as sd
 
