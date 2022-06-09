@@ -28,9 +28,8 @@ class TextInterpreter():
     self.say_pub = rospy.Publisher('/say', String, queue_size=2)
 
   def interpret(self, translation: String):
-    
     # Check if it is the awake command
-    if Task.awake_call in translation:
+    if Task.awake_call.value in translation.data:
       self.say_pub.publish(String(data=Say.im_listening.name))
       return
 

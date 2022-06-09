@@ -12,11 +12,10 @@ from audio_common_msgs.msg import AudioData
 class AudioTranslator():
 
   def __init__(self):
-    rospy.loginfo("HELLO")
     self.tokenizer = Wav2Vec2Tokenizer.from_pretrained("facebook/wav2vec2-base-960h")
     self.model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
 
-    audio_sub = message_filters.Subscriber('audio/translate', AudioData)
+    audio_sub = message_filters.Subscriber('/audio/translate', AudioData)
     audio_sub.registerCallback(self.translate)
 
     # Publishes translation
@@ -24,14 +23,15 @@ class AudioTranslator():
 
 
   def translate(self, audioClip: AudioData):
-    input_values = self.tokenizer(audioClip.data, return_tensors="pt").input_values
+    # rospy.loginfo("Recieved Audio Clip")
+    input_values = self.tokenizer(np.frombuffer(audioClip.data, dtype=np.float32), return_tensors="pt").input_values
     logits = self.model(input_values).logits
     predicted_ids = np.argmax(logits.cpu().detach().numpy(), axis=-1)
     transcription = self.tokenizer.batch_decode(predicted_ids)[0]
     
     self.translation_pub.publish(transcription)
 
-    rospy.loginfo(transcription)
+    rospy.loginfo("Translation = " + transcription)
 
 
 # def main():
