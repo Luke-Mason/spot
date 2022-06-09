@@ -14,12 +14,14 @@ from threading import Timer
 class VoicePlayer():
 
   def __init__(self):
-    self.listener_type = rospy.get_param("~listener_type", "on_demand")
-
     say_sub = message_filters.Subscriber("/say", String)
     say_sub.registerCallback(self.say)
 
   def say(self, say: String):
+    rospy.loginfo("HELLOOOOOOOO")
+
+    rospy.loginfo("Yes? " + say.data)
+    rospy.loginfo(Say[say.data].name)
     if Say[say.data].name == Say.im_listening.name:
       rospy.loginfo("Yes?")
 

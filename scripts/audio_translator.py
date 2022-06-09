@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
+from dataclasses import dataclass
 import time
 import numpy as np
 import message_filters
 import rospy
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Tokenizer
-from std_msgs.msg import String, Float32MultiArray
+from std_msgs.msg import String, Float32MultiArray, UInt8MultiArray
 
 
 class AudioTranslator():
@@ -17,6 +18,16 @@ class AudioTranslator():
 
     self.tokenizer = Wav2Vec2Tokenizer.from_pretrained(pretrained_model_name_or_path)
     self.model = Wav2Vec2ForCTC.from_pretrained(pretrained_model_name_or_path)
+
+
+    # Dynamic audio type to convert byte audio data into.
+    audio_type_str = rospy.get_param("~sample_format", "F32LE")
+    if audio_type_str == "F32LE":
+      self.data_class = Float32MultiArray
+    elif audio_type_str == "U8":
+      self.data_class = UInt8MultiArray
+    else:
+      raise Exception("Unknown audio type: " + str(audio_type_str))
 
     audio_sub = message_filters.Subscriber(receive_from, Float32MultiArray)
     audio_sub.registerCallback(self.translate)

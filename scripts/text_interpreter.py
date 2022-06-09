@@ -23,17 +23,18 @@ class TextInterpreter():
     listen_sub.registerCallback(self.set_listen)
 
     # Acts upon recieving the audio translations.
-    translation_sub = message_filters.Subscriber('translation', String)
+    translation_sub = message_filters.Subscriber('/translation', String)
     translation_sub.registerCallback(self.build_understanding)
     
     # Publishers
-    self.command_pub = rospy.Publisher('/command', String, queue_size=2)
-    self.response_pub = rospy.Publisher('/response', String, queue_size=2)
-    self.say_pub = rospy.Publisher('/say', String, queue_size=2)
+    self.command_pub = rospy.Publisher('/command', String, queue_size=1)
+    self.response_pub = rospy.Publisher('/response', String, queue_size=1)
+    self.say_pub = rospy.Publisher('/say', String, queue_size=1)
 
   def build_understanding(self, translation: String):
-    self.heard_words.extend(translation.data.split(" "))
-
+    # rospy.loginfo(translation.data)
+    self.heard_words.extend(translation.data.split())
+    rospy.loginfo(self.heard_words)
     # Check if it is the awake command
     if Task.awake_call.value in self.heard_words:
       self.interpret_as_awake()
@@ -41,7 +42,16 @@ class TextInterpreter():
     
   
   def interpret_as_awake(self):
-    self.say_pub.publish(String(data=Say.im_listening.name))
+    say = String()
+    say.data = Say.im_listening.name
+
+    # TODO
+    self.say_pub.publish(say)
+    self.say_pub.publish(say)
+    self.say_pub.publish(say)
+    self.say_pub.publish(say)
+    self.say_pub.publish(say)
+
     self.heard_words = []
 
   def set_listen(self, listener_status: String):

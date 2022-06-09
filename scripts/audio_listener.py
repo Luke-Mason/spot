@@ -77,30 +77,29 @@ class AudioListenerNode():
     self.timer.start()
 
   def listen_to_audio(self, audio_data: AudioData):
-
     if self.listener_type == "on_demand":
       if self.status == Status.idle:
         return
       elif self.status == Status.listening:
-        self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=self.audio_type))
+        self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=np.float32))
 
     elif self.listener_type == "constant":
-      self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=self.audio_type))
-      array = self.publish_audio()
+      self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=np.float32))
 
-      if len(self.collected_audio) >= self.sample_rate * self.samples_to_publish:
-        self.collected_audio = array.data[len(self.collected_audio) - (self.samples_to_keep * self.sample_rate):]
+      if self.collected_audio.size >= self.sample_rate * self.samples_to_publish:
+        array = self.publish_audio()
+        self.collected_audio = array.data[len(array.data) - (self.samples_to_keep * self.sample_rate):]
     else:
       raise Exception("Unrecognised listener type")
 
-  def publish_audio(self):
+  def publish_audio(self) -> Float32MultiArray:
 
     # Stop adding to collected sound
     self.status = Status.idle
 
     # Package the data to send
-    array = self.data_class()
-    array.data = self.collected_audio
+    array = Float32MultiArray()
+    array.data = self.collected_audio.tolist()
 
     # Publish audio data to be translated
     self.audio_pub.publish(array)
