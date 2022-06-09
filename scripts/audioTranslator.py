@@ -5,8 +5,7 @@ import numpy as np
 import message_filters
 import rospy
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Tokenizer
-from std_msgs.msg import String
-from audio_common_msgs.msg import AudioData
+from std_msgs.msg import String, Float32MultiArray
 
 
 class AudioTranslator():
@@ -15,16 +14,16 @@ class AudioTranslator():
     self.tokenizer = Wav2Vec2Tokenizer.from_pretrained("facebook/wav2vec2-base-960h")
     self.model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
 
-    audio_sub = message_filters.Subscriber('/audio/translate', AudioData)
+    audio_sub = message_filters.Subscriber('/audio/translate', Float32MultiArray)
     audio_sub.registerCallback(self.translate)
 
     # Publishes translation
     self.translation_pub = rospy.Publisher('/translation', String, queue_size=2)
 
 
-  def translate(self, audioClip: AudioData):
-    # rospy.loginfo("Recieved Audio Clip")
-    input_values = self.tokenizer(np.frombuffer(audioClip.data, dtype=np.float32), return_tensors="pt").input_values
+  def translate(self, array: Float32MultiArray):
+    rospy.loginfo(np.shape(array.data))
+    input_values = self.tokenizer(array.data, return_tensors="pt").input_values
     logits = self.model(input_values).logits
     predicted_ids = np.argmax(logits.cpu().detach().numpy(), axis=-1)
     transcription = self.tokenizer.batch_decode(predicted_ids)[0]

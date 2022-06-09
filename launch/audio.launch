@@ -1,14 +1,27 @@
 <launch>
+    <arg name="sample_rate" default="16000"/>
+    <arg name="sample_format" default="F32LE"/>
+    <arg name="bitrate" default="128"/>
+    <arg name="channels" default="1"/>
+    <arg name="device" default=""/>
+    <arg name="depth" default="16"/>
+    <arg name="audio_seconds_before_publish" default="2"/>
+    <arg name="last_audio_seconds_to_republish" default="1"/>
+
+
     <node name="audio_capture" pkg="audio_capture" type="audio_capture" output="screen">
-        <param name="device" value="" />
+        <param name="device" value="$(arg device)" />
         <param name="format" value="wave" />
         <param name="channels" value="1" />
-        <param name="depth" value="16" />
-        <param name="sample_rate" value="16000" />
-        <param name="sample_format" value="F32LE" />
-        <!-- value="F32LE" -->
+        <param name="depth" value="$(arg depth)" />
+        <param name="sample_rate" value="$(arg sample_rate)" />
+        <param name="sample_format" value="$(arg sample_format)" />
     </node>
-    <node pkg="spot" name="AudioListener" type="audioListener.py" output="screen"/>
+    <node pkg="spot" name="AudioListener" type="audioListener.py" output="screen">
+        <param name="samples_to_publish" value="$(arg audio_seconds_before_publish)" />
+        <param name="samples_to_keep" value="$(arg last_audio_seconds_to_republish)" />
+        <param name="sample_rate" value="$(arg sample_rate)" />
+    </node>
     <node pkg="spot" name="AudioTranslator" type="audioTranslator.py" output="screen"/>
     <node pkg="spot" name="TextInterpreter" type="textInterpreter.py" output="screen"/>
 </launch>
