@@ -1,7 +1,14 @@
 <launch>
-    <node pkg="SPOT" name="AudioListener" type="audioListener.py" output="screen">
+    <node name="audio_capture" pkg="audio_capture" type="audio_capture" output="screen">
+        <param name="device" value="" />
+        <param name="format" value="wave" />
+        <param name="channels" value="1" />
+        <param name="depth" value="16" />
+        <param name="sample_rate" value="16000" />
+    </node>
+    <node pkg="spot" name="AudioListener" type="audioListener.py" output="screen">
         <param name="samplerate" value="16000" />
     </node>
-    <node pkg="SPOT" name="AudioTranslator" type="audioTranslator.py" output="screen"/>
-    <node pkg="SPOT" name="TextInterpreter" type="textInterpreter.py" output="screen"/>
+    <node pkg="spot" name="AudioTranslator" type="audioTranslator.py" output="screen"/>
+    <node pkg="spot" name="TextInterpreter" type="textInterpreter.py" output="screen"/>
 </launch>

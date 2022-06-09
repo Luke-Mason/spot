@@ -4,6 +4,11 @@ sudo apt-get install build-essential
 sudo apt-get install zlib1g-dev
 sudo apt-get install libssl-dev
 sudo apt-get install libreadline-dev
+sudo apt-get install libportaudio2
+sudo apt-get install ros-noetic-audio-common
+
+pip install transformers==4.11.3
+pip install torch torchaudio
 
 # Run the following command
 curl https://pyenv.run | bash
@@ -33,7 +38,7 @@ mkdir src
 cd src
 
 # Clone our github repo into the src folder if you havent already
-git clone https://github.com/Luke-Mason/SPOT.git
+git clone https://github.com/Luke-Mason/spot.git
 
 
 # Try to get catkin_make working. You might run into a few errors, try the following commands first: 

@@ -7,5 +7,5 @@
 
 
     <!-- Launch Audio Interpretation -->
-    <include file="$(find SPOT)/launch/audio.launch" />
+    <include file="$(find spot)/launch/audio.launch" />
 </launch>
