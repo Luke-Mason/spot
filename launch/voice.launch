@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="spot" name="VoicePlayer" type="voice_player.py" />
+</launch>

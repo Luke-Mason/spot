@@ -5,7 +5,9 @@
 
     <!-- Launch Object Detection -->
 
-
     <!-- Launch Audio Interpretation -->
     <include file="$(find spot)/launch/audio.launch" />
+
+    <!-- Launch Voice for Spot -->
+    <include file="$(find spot)/launch/voice.launch" />
 </launch>

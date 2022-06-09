@@ -11,18 +11,21 @@ from std_msgs.msg import String, Float32MultiArray
 class AudioTranslator():
 
   def __init__(self):
-    self.tokenizer = Wav2Vec2Tokenizer.from_pretrained("facebook/wav2vec2-base-960h")
-    self.model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
+    receive_from = rospy.get_param("~receive_from", "/audio/translate")
+    send_to = rospy.get_param("~send_to", "/translation")
+    pretrained_model_name_or_path = rospy.get_param("~pretrained_model_name_or_path", "facebook/wav2vec2-base-960h")
 
-    audio_sub = message_filters.Subscriber('/audio/translate', Float32MultiArray)
+    self.tokenizer = Wav2Vec2Tokenizer.from_pretrained(pretrained_model_name_or_path)
+    self.model = Wav2Vec2ForCTC.from_pretrained(pretrained_model_name_or_path)
+
+    audio_sub = message_filters.Subscriber(receive_from, Float32MultiArray)
     audio_sub.registerCallback(self.translate)
 
     # Publishes translation
-    self.translation_pub = rospy.Publisher('/translation', String, queue_size=2)
+    self.translation_pub = rospy.Publisher(send_to, String, queue_size=2)
 
 
   def translate(self, array: Float32MultiArray):
-    rospy.loginfo(np.shape(array.data))
     input_values = self.tokenizer(array.data, return_tensors="pt").input_values
     logits = self.model(input_values).logits
     predicted_ids = np.argmax(logits.cpu().detach().numpy(), axis=-1)

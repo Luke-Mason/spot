@@ -1,8 +1,0 @@
-<launch>
-
-    <node name="straight_drive" pkg="spot" type="straight_drive.py" >
-        <param name="speed" value="0.1" />
-        <param name="duration" value="4" />
-    </node>
-
-</launch>

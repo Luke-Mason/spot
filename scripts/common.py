@@ -14,7 +14,7 @@ class Task(Enum):
     find = "FIND"
     go_to = "GO TO"
     check = "CHECK"
-    awake_call = "HEY SPOT"
+    awake_call = "SPOT"
 
 class Listen(Enum):
     response = 4
@@ -22,7 +22,7 @@ class Listen(Enum):
     command = 4
 
 class Say(Enum):
-    im_listening = 0
+    im_listening = ["path/to/file"]
 
 
 
