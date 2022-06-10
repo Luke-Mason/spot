@@ -12,7 +12,7 @@
     <!-- Launch Object Detection -->
 
     <!-- Launch Audio Interpretation -->
-    <include file="$(find spot)/launch/audio.launch" >
+    <include file="$(find nurse)/launch/audio.launch" >
         <arg name="demands_topic" value="$(arg demands_topic)"/>  
         <arg name="say_topic" value="$(arg say_topic)" />
         <arg name="command_topic" value="$(arg command_topic)" />
@@ -21,7 +21,7 @@
     </include>
 
     <!-- Launch Voice for Spot -->
-    <include file="$(find spot)/launch/voice.launch" >
+    <include file="$(find nurse)/launch/voice.launch" >
         <arg name="demands_topic" value="$(arg demands_topic)"/>  
         <arg name="say_topic" value="$(arg say_topic)" />
     </include>
