@@ -1,13 +1,18 @@
 <package>
-  <description brief="spot">
+  <name>spot</name>
+  <version>1.0.0</version>
+  <description>spot environment for experimenting and working on the assignment.</description>
+  <maintainer email="lukeymason.15@gmail.com">Luke Mason</maintainer>
+ 
 
-     spot environment for experimenting and working on the assignment.
-
-  </description>
   <author>Luke Mason</author>
-  <author>Andrew Davey</author>
   <license>BSD</license>
-  <review status="unreviewed" notes=""/>
+  <!-- <review status="unreviewed" notes=""/> -->
   <url>http://ros.org/wiki/spot</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rospy</build_depend>
+  <run_depend>rospy</run_depend>
 
 </package>

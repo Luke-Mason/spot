@@ -1,4 +1,0 @@
-<launch>
-    <node pkg="spot" name="chatter" type="chatter.py" output="screen"/>
-    <node pkg="spot" name="listener" type="listener.py" output="screen"/>
-</launch>

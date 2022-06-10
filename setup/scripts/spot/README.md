@@ -1,2 +1,2 @@
 # Spot Setup Scripts
-This contains scripts to setup SPOT for the project.
+This contains scripts to setup spot for the project.

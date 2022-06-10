@@ -1,0 +1,68 @@
+<launch>
+    <arg name="sample_rate" default="16000"/>
+    <arg name="sample_format" default="F32LE"/>
+    <arg name="bitrate" default="128"/>
+    <arg name="channels" default="1"/>
+    <arg name="device" default=""/>
+    <arg name="depth" default="16"/>
+
+    <!-- Constant Listener args -->
+    <arg name="audio_seconds_before_publish" default="1"/>
+    <arg name="last_audio_seconds_to_republish" default="0"/>
+    
+    <!-- Default topic args -->
+    <arg name="demands_topic" default="listen" />
+    <arg name="say_topic" default="say" />
+    <arg name="audio_topic" default="audio" />
+    <arg name="translate_topic" default="audio/translate" />
+    <arg name="translation_topic" default="translation" />
+    <arg name="command_topic" default="command" />
+    <arg name="response_topic" default="response" />
+
+    <!-- Captures Audio and publishes it. -->
+    <node name="audio_capture" pkg="audio_capture" type="audio_capture" output="screen">
+        <param name="device" value="$(arg device)" />
+        <param name="format" value="wave" />
+        <param name="channels" value="1" />
+        <param name="depth" value="$(arg depth)" />
+        <param name="sample_rate" value="$(arg sample_rate)" />
+        <param name="sample_format" value="$(arg sample_format)" />
+    </node>
+
+    <!-- Audio listener that listens to audio published and converts audio byte data into audio input for translator -->
+    <node pkg="spot" name="ConstantListener" type="audio_listener.py" output="screen">
+        <param name="translate_topic" value="$(arg translate_topic)" />
+        <param name="audio_topic" value="$(arg audio_topic)" />
+        <param name="listener_type" value="constant" />
+
+
+        <param name="samples_to_publish" value="$(arg audio_seconds_before_publish)" />
+        <param name="samples_to_keep" value="$(arg last_audio_seconds_to_republish)" />
+        <param name="sample_rate" value="$(arg sample_rate)" />
+    </node>
+
+    <!-- Audio listener that listens to awake command -->
+    <node pkg="spot" name="OnDemandListener" type="audio_listener.py" output="screen">
+        <param name="translate_topic" value="$(arg translate_topic)" />
+        <param name="audio_topic" value="$(arg audio_topic)" />
+        <param name="listener_type" value="on_demand" />
+
+
+        <param name="demands_topic" value="$(arg demands_topic)"/>
+    </node>
+
+    <!-- Translates audio input data into text -->
+    <node pkg="spot" name="AudioTranslator" type="audio_translator.py" output="screen">
+        <param name="recieve_from" value="$(arg translate_topic)" />
+        <param name="send_to" value="$(arg translation_topic)" />
+    </node>
+
+    <!-- Figures out what text is a command, repsonse or awake call -->
+    <node pkg="spot" name="TextInterpreter" type="text_interpreter.py" output="screen">
+        <param name="say_topic" value="$(arg say_topic)" />
+        <param name="demands_topic" value="$(arg demands_topic)" />
+        <param name="command_topic" value="$(arg command_topic)" />
+        <param name="response_topic" value="$(arg response_topic)" />
+        <param name="translation_topic" value="$(arg translation_topic)" />
+    </node>
+</launch>
