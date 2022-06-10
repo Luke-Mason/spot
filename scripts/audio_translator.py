@@ -12,8 +12,8 @@ from std_msgs.msg import String, Float32MultiArray, UInt8MultiArray
 class AudioTranslator():
 
   def __init__(self):
-    receive_from = rospy.get_param("~receive_from", "/audio/translate")
-    send_to = rospy.get_param("~send_to", "/translation")
+    receive_from = rospy.get_param("~receive_from", "audio/translate")
+    send_to = rospy.get_param("~send_to", "translation")
     pretrained_model_name_or_path = rospy.get_param("~pretrained_model_name_or_path", "facebook/wav2vec2-base-960h")
 
     self.tokenizer = Wav2Vec2Tokenizer.from_pretrained(pretrained_model_name_or_path)
@@ -29,14 +29,14 @@ class AudioTranslator():
     else:
       raise Exception("Unknown audio type: " + str(audio_type_str))
 
-    audio_sub = message_filters.Subscriber(receive_from, Float32MultiArray)
+    audio_sub = message_filters.Subscriber(receive_from, self.data_class)
     audio_sub.registerCallback(self.translate)
 
     # Publishes translation
-    self.translation_pub = rospy.Publisher(send_to, String, queue_size=2)
+    self.translation_pub = rospy.Publisher("/" + send_to, String, queue_size=1)
 
 
-  def translate(self, array: Float32MultiArray):
+  def translate(self, array):
     input_values = self.tokenizer(array.data, return_tensors="pt").input_values
     logits = self.model(input_values).logits
     predicted_ids = np.argmax(logits.cpu().detach().numpy(), axis=-1)

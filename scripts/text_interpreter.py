@@ -5,13 +5,17 @@ import time
 import rospy
 import message_filters
 from std_msgs.msg import String
-from common import Listen, Say, Task
+from common import Command, Listen, Say, Task
 
 
 class TextInterpreter():
 
   def __init__(self):
-    # self.interpreter_type = rospy.get_param("~interpreter_type", "everything")
+    say_topic = rospy.get_param("~say_topic", "say")
+    response_topic = rospy.get_param("~response_topic", "response")
+    command_topic = rospy.get_param("~command_topic", "command")
+    translation_topic = rospy.get_param("~translation_topic", "translation")
+    demands_topic = rospy.get_param("~demands_topic", "listen")
 
     self.heard_words = []
 
@@ -19,40 +23,60 @@ class TextInterpreter():
     self.listener_status = Listen.awake
 
     # Set the change in context.
-    listen_sub = message_filters.Subscriber('listen', String)
+    listen_sub = message_filters.Subscriber(demands_topic, String)
     listen_sub.registerCallback(self.set_listen)
 
     # Acts upon recieving the audio translations.
-    translation_sub = message_filters.Subscriber('/translation', String)
+    translation_sub = message_filters.Subscriber(translation_topic, String)
     translation_sub.registerCallback(self.build_understanding)
     
     # Publishers
-    self.command_pub = rospy.Publisher('/command', String, queue_size=1)
-    self.response_pub = rospy.Publisher('/response', String, queue_size=1)
-    self.say_pub = rospy.Publisher('/say', String, queue_size=1)
+    self.command_pub = rospy.Publisher("/" + command_topic, String, queue_size=1)
+    self.response_pub = rospy.Publisher("/" + response_topic, String, queue_size=1)
+    self.say_pub = rospy.Publisher("/" + say_topic, String, queue_size=1)
+
+  def check_call_called(self, call_phrase):
+
+    # If all words in phrase are found in the heard words in order then return True
+    current_index = 0
+
+    for word in call_phrase.split():
+      if word not in self.heard_words[current_index:]:
+        return False
+
+      current_index = self.heard_words.index(word)
+    
+    return True      
 
   def build_understanding(self, translation: String):
     # rospy.loginfo(translation.data)
     self.heard_words.extend(translation.data.split())
     rospy.loginfo(self.heard_words)
+
     # Check if it is the awake command
-    if Task.awake_call.value in self.heard_words:
-      self.interpret_as_awake()
-      return
+    for call_phrase in Task.awake.value:
+      result = self.check_call_called(call_phrase)
+      if result:
+        self.say(Say.im_listening.name)
+    
+    for call_phrase in Task.find.value:
+      result = self.check_call_called(call_phrase)
+      if result:
+        self.say(Say.ok_searching.name)
+
+    for call_phrase in Task.go_to.value:
+      result = self.check_call_called(call_phrase)
+      if result:
+        self.say(Say.ok_going.name)
     
   
-  def interpret_as_awake(self):
+  def say(self, say_type):
     say = String()
-    say.data = Say.im_listening.name
+    say.data = say_type
 
-    # TODO
     self.say_pub.publish(say)
-    self.say_pub.publish(say)
-    self.say_pub.publish(say)
-    self.say_pub.publish(say)
-    self.say_pub.publish(say)
-
     self.heard_words = []
+
 
   def set_listen(self, listener_status: String):
         self.listener_status = Listen[listener_status.data]

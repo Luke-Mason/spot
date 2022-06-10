@@ -19,11 +19,11 @@ class AudioListenerNode():
 
   def __init__(self):
     self.listener_type = rospy.get_param("~listener_type", "on_demand")
-    translate_topic = rospy.get_param("~translate_topic", "/audio/translate")
-    audio_topic = rospy.get_param("~audio_topic", "/audio")
+    translate_topic = rospy.get_param("~translate_topic", "audio/translate")
+    audio_topic = rospy.get_param("~audio_topic", "audio")
 
     if self.listener_type == "on_demand":
-      demands_topic = rospy.get_param("~demands_topic", "/listen")
+      demands_topic = rospy.get_param("~demands_topic", "listen")
       
       # Set the change in context.
       listen_sub = message_filters.Subscriber(demands_topic, String)
@@ -54,7 +54,7 @@ class AudioListenerNode():
     audio_sub.registerCallback(self.listen_to_audio)
 
     # Publishers
-    self.audio_pub = rospy.Publisher(translate_topic, Float32MultiArray, queue_size=2)
+    self.audio_pub = rospy.Publisher("/" + translate_topic, self.data_class, queue_size=1)
     self.reset_collected_audio()
 
   def reset_collected_audio(self):
@@ -81,10 +81,10 @@ class AudioListenerNode():
       if self.status == Status.idle:
         return
       elif self.status == Status.listening:
-        self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=np.float32))
+        self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=self.audio_type))
 
     elif self.listener_type == "constant":
-      self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=np.float32))
+      self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=self.audio_type))
 
       if self.collected_audio.size >= self.sample_rate * self.samples_to_publish:
         array = self.publish_audio()
@@ -92,13 +92,13 @@ class AudioListenerNode():
     else:
       raise Exception("Unrecognised listener type")
 
-  def publish_audio(self) -> Float32MultiArray:
+  def publish_audio(self):
 
     # Stop adding to collected sound
     self.status = Status.idle
 
     # Package the data to send
-    array = Float32MultiArray()
+    array = self.data_class()
     array.data = self.collected_audio.tolist()
 
     # Publish audio data to be translated

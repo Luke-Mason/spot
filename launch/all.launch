@@ -1,4 +1,10 @@
 <launch>
+    <arg name="demands_topic" default="listen" />
+    <arg name="say_topic" default="say" />
+    <arg name="command_topic" default="command" />
+    <arg name="response_topic" default="response" />
+    <arg name="translation_topic" default="translation" />
+
     <!-- Launch Hardware -->
 
     <!-- Launch Mapping & Navigation-->
@@ -6,8 +12,17 @@
     <!-- Launch Object Detection -->
 
     <!-- Launch Audio Interpretation -->
-    <include file="$(find spot)/launch/audio.launch" />
+    <include file="$(find spot)/launch/audio.launch" >
+        <arg name="demands_topic" value="$(arg demands_topic)"/>  
+        <arg name="say_topic" value="$(arg say_topic)" />
+        <arg name="command_topic" value="$(arg command_topic)" />
+        <arg name="response_topic" value="$(arg response_topic)" />
+        <arg name="translation_topic" value="$(arg translation_topic)" />
+    </include>
 
     <!-- Launch Voice for Spot -->
-    <include file="$(find spot)/launch/voice.launch" />
+    <include file="$(find spot)/launch/voice.launch" >
+        <arg name="demands_topic" value="$(arg demands_topic)"/>  
+        <arg name="say_topic" value="$(arg say_topic)" />
+    </include>
 </launch>

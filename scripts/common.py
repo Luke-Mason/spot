@@ -11,10 +11,10 @@ class Target(Enum):
     luke = "LUKE"
 
 class Task(Enum):
-    find = "FIND"
-    go_to = "GO TO"
-    check = "CHECK"
-    awake_call = "SPOT"
+    find = ["FIND", "FI ND"]
+    go_to = ["GO TO"]
+    check = ["CHECK"]
+    awake = ["SPOT", "SPO OT", "SPOOT"]
 
 class Listen(Enum):
     response = 4
@@ -23,6 +23,8 @@ class Listen(Enum):
 
 class Say(Enum):
     im_listening = ["path/to/file"]
+    ok_searching = []
+    ok_going = []
 
 
 

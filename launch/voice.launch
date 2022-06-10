@@ -1,3 +1,9 @@
 <launch>
-    <node pkg="spot" name="VoicePlayer" type="voice_player.py" />
+    <arg name="demands_topic" default="listen" />
+    <arg name="say_topic" default="say" />
+
+    <node pkg="spot" name="VoicePlayer" type="voice_player.py" >
+        <param name="demands_topic" value="$(arg demands_topic)" />
+        <param name="say_topic" value="$(arg say_topic)" />
+    </node>
 </launch>
