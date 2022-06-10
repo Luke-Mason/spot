@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(spot)
+project(project)
 catkin_package()
 # add_dependencies(spot ${catkin_EXPORTED_TARGETS})
 

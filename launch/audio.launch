@@ -47,7 +47,6 @@
         <param name="audio_topic" value="$(arg audio_topic)" />
         <param name="listener_type" value="on_demand" />
 
-
         <param name="demands_topic" value="$(arg demands_topic)"/>
     </node>
 

@@ -57,13 +57,16 @@ class AudioListenerNode():
     self.audio_pub = rospy.Publisher("/" + translate_topic, self.data_class, queue_size=1)
     self.reset_collected_audio()
 
+    self.timer = None
+
   def reset_collected_audio(self):
     self.collected_audio = np.ndarray([])
 
   def start_listening(self, listen: String):
 
     # Cancel any previous timer.
-    self.timer.cancel()
+    if self.timer is not None:
+      self.timer.cancel()
 
     # Reset any current task it is listening to. 
     # (Useful for if we say awake call during listening for a response to reset listening)
@@ -88,7 +91,7 @@ class AudioListenerNode():
 
       if self.collected_audio.size >= self.sample_rate * self.samples_to_publish:
         array = self.publish_audio()
-        self.collected_audio = array.data[len(array.data) - (self.samples_to_keep * self.sample_rate):]
+        # self.collected_audio = np.ndarray(array.data[len(array.data) - (self.samples_to_keep * self.sample_rate):])
     else:
       raise Exception("Unrecognised listener type")
 
