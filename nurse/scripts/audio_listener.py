@@ -18,24 +18,20 @@ Status = Enum("Status", "listening idle")
 class AudioListenerNode():
 
   def __init__(self):
-    self.listener_type = rospy.get_param("~listener_type", "on_demand")
-    translate_topic = rospy.get_param("~translate_topic", "audio/translate")
+    self.listener_type = rospy.get_param("~listener_type", "constant")
+    translate_topic = rospy.get_param("~translate_topic", "translate")
     audio_topic = rospy.get_param("~audio_topic", "audio")
+    demands_topic = rospy.get_param("~demands_topic", "listen")
 
-    if self.listener_type == "on_demand":
-      demands_topic = rospy.get_param("~demands_topic", "listen")
-      
-      # Set the change in context.
-      listen_sub = message_filters.Subscriber(demands_topic, String)
-      listen_sub.registerCallback(self.start_listening)
+    self.threshold = rospy.get_param("~threshold", 0.007)
+    self.idle_wait_time = rospy.get_param("~idle_wait_time", 0.5)
+    self.max_samples = rospy.get_param("~max_samples_per_publish", 4) 
+    self.default_max_samples = self.max_samples
+    self.sample_rate = rospy.get_param("~sample_rate", 16000)
 
-    elif self.listener_type == "constant":
-      self.samples_to_publish = rospy.get_param("~samples_to_publish", 2) 
-      self.samples_to_keep = rospy.get_param("~samples_to_keep", 1) 
-      self.sample_rate = rospy.get_param("~sample_rate", 16000)
-    else:
-      raise Exception("Unknown listener type: " + str(self.listener_type))
-
+    # Set the change in context.
+    listen_sub = message_filters.Subscriber(demands_topic, String)
+    listen_sub.registerCallback(self.start_listening_to_demand)
 
     # Dynamic audio type to convert byte audio data into.
     audio_type_str = rospy.get_param("~sample_format", "F32LE")
@@ -62,53 +58,77 @@ class AudioListenerNode():
   def reset_collected_audio(self):
     self.collected_audio = np.ndarray([])
 
-  def start_listening(self, listen: String):
-
+  def start_listening_to_demand(self, listen: String):
+    if listen.data == Listen.awake.name:
+      self.listener_type = "constant"
+      return
+      
     # Cancel any previous timer.
-    if self.timer is not None:
-      self.timer.cancel()
-
     # Reset any current task it is listening to. 
     # (Useful for if we say awake call during listening for a response to reset listening)
+    self.cancel_timer()
     self.reset_collected_audio()
+    self.max_samples = Listen[listen.data].value
+    self.listener_type = "on_demand"
 
-    # Get the listening duration for the listen type (command, or response etc).
-    listen_duration = Listen[listen.data].value
-    
-    # Publish collected audio after duration.
-    self.timer = Timer(float(listen_duration), self.publish_audio)
-    self.timer.start()
+  def cancel_timer(self):
+    if self.timer is not None:
+      self.timer.cancel()
+      self.timer.join()
 
   def listen_to_audio(self, audio_data: AudioData):
-    if self.listener_type == "on_demand":
+    data = np.frombuffer(audio_data.data, dtype=self.audio_type)
+    collected_data = np.append(self.collected_audio, data)
+
+    if self.listener_type == "constant":
+      self.max_samples = self.default_max_samples
+    elif self.listener_type == "none":
+      return
+
+    
+      
+    # Start/Continue listening if the audio is above threshold.
+    if np.max(np.absolute(data)) >= self.threshold:
       if self.status == Status.idle:
-        return
-      elif self.status == Status.listening:
-        self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=self.audio_type))
+        self.status = Status.listening
+        rospy.loginfo("LISTENING")
 
-    elif self.listener_type == "constant":
-      self.collected_audio = np.append(self.collected_audio, np.frombuffer(audio_data.data, dtype=self.audio_type))
+      # Publish collected audio after duration.
+      self.cancel_timer()
+      self.timer = Timer(self.idle_wait_time, self.publish_audio)
+      self.timer.start()
 
-      if self.collected_audio.size >= self.sample_rate * self.samples_to_publish:
-        array = self.publish_audio()
-        # self.collected_audio = np.ndarray(array.data[len(array.data) - (self.samples_to_keep * self.sample_rate):])
-    else:
-      raise Exception("Unrecognised listener type")
+    # Collect data as we are now in listening mode.
+    if self.status == Status.listening:
+      self.collected_audio = collected_data
+
+    # Publish max recording (Stops recording forever if audio constantly above threshold).
+    if self.status == Status.listening and self.collected_audio.size >= self.sample_rate * self.max_samples:
+      rospy.loginfo("Publishing max")
+      rospy.loginfo(self.collected_audio.size)
+      self.publish_audio()
 
   def publish_audio(self):
+    # self.cancel_timer()
 
-    # Stop adding to collected sound
-    self.status = Status.idle
+    # Check that the collected audio is a factor of the sample rate, filling missing slots with 0
+    remainder = len(self.collected_audio) % self.sample_rate
+    if remainder > 0:
+      left_over_slots = self.sample_rate - remainder
+      self.collected_audio = np.concatenate((self.collected_audio, np.zeros(left_over_slots, dtype=self.audio_type)))
 
     # Package the data to send
     array = self.data_class()
-    array.data = self.collected_audio.tolist()
+    array.data = list(self.collected_audio.tolist())
 
     # Publish audio data to be translated
     self.audio_pub.publish(array)
     self.reset_collected_audio()
 
-    return array
+    # Set back to constant if changed
+    self.listener_type = "constant"
+    self.status = Status.idle
+    rospy.loginfo("Sent")
 
 
 # def main():

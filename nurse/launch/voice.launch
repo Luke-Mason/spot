@@ -2,7 +2,7 @@
     <arg name="demands_topic" default="listen" />
     <arg name="say_topic" default="say" />
 
-    <node pkg="nurse" name="VoicePlayer" type="voice_player.py" >
+    <node pkg="nurse" name="VoicePlayer" type="voice_player.py" output="screen">
         <param name="demands_topic" value="$(arg demands_topic)" />
         <param name="say_topic" value="$(arg say_topic)" />
     </node>

@@ -5,7 +5,7 @@ import time
 import rospy
 import message_filters
 from std_msgs.msg import String
-from common import Command, Listen, Say, Task
+from common import Command, Listen, Say, Calls
 
 
 class TextInterpreter():
@@ -16,6 +16,8 @@ class TextInterpreter():
     command_topic = rospy.get_param("~command_topic", "command")
     translation_topic = rospy.get_param("~translation_topic", "translation")
     demands_topic = rospy.get_param("~demands_topic", "listen")
+    
+    self.max_words = rospy.get_param("~max_words", 50)
 
     self.heard_words = []
 
@@ -40,6 +42,7 @@ class TextInterpreter():
     # If all words in phrase are found in the heard words in order then return True
     current_index = 0
 
+    # Check that the series of words are all existent in order.
     for word in call_phrase.split():
       if word not in self.heard_words[current_index:]:
         return False
@@ -49,25 +52,59 @@ class TextInterpreter():
     return True      
 
   def build_understanding(self, translation: String):
-    # rospy.loginfo(translation.data)
     self.heard_words.extend(translation.data.split())
-    rospy.loginfo(self.heard_words)
 
-    # Check if it is the awake command
-    for call_phrase in Task.awake.value:
-      result = self.check_call_called(call_phrase)
-      if result:
-        self.say(Say.im_listening.name)
-    
-    for call_phrase in Task.find.value:
-      result = self.check_call_called(call_phrase)
-      if result:
-        self.say(Say.ok_searching.name)
+    if self.listener_status == Listen.awake:
 
-    for call_phrase in Task.go_to.value:
-      result = self.check_call_called(call_phrase)
-      if result:
-        self.say(Say.ok_going.name)
+      # Check if it is the awake command
+      rospy.loginfo("IS awake?")
+      for call_phrase in Calls.awake.value:
+        result = self.check_call_called(call_phrase)
+        if result:
+          self.say(Say.im_listening.name)
+          return
+
+    elif self.listener_status == Listen.command:
+
+      for call_phrase in Calls.stop.value:
+        result = self.check_call_called(call_phrase)
+        if result:
+          self.say(Say.stopping.name)
+          return
+ 
+      for call_phrase in Calls.find.value:
+        result = self.check_call_called(call_phrase)
+        if result:
+          self.say(Say.ok_searching.name)
+          return
+
+      for call_phrase in Calls.go_to.value:
+        result = self.check_call_called(call_phrase)
+        if result:
+          self.say(Say.ok_going.name)
+          return
+
+      if len(translation.data) == 0:
+        self.say(Say.nothing.name)
+        return
+      
+      self.say(Say.did_not_understand.name)
+
+
+    elif self.listener_status == Listen.response:
+      for call_phrase in Calls.go_to.value:
+        result = self.check_call_called(call_phrase)
+        if result:
+          return
+      if len(translation.data) == 0:
+        self.say(Say.nothing.name)
+        return
+      
+      self.say(Say.did_not_understand.name)
+      
+
+    if len(self.heard_words) > self.max_words:
+      self.heard_words = self.heard_words[len(self.heard_words) - self.max_words:]
     
   
   def say(self, say_type):
@@ -79,7 +116,7 @@ class TextInterpreter():
 
 
   def set_listen(self, listener_status: String):
-        self.listener_status = Listen[listener_status.data]
+    self.listener_status = Listen[listener_status.data]
 
 
 

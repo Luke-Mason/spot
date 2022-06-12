@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="nurse" name="Brain" type="brain.py" output="screen">
+   
+    </node>
+</launch>
