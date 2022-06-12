@@ -23,10 +23,10 @@ class Listen(Enum):
     command = 4
 
 class Say(Enum):
-    im_listening = ["../media/yes?.mp3"]
-    ok_searching = ["../media/ok_searching.mp3"]
-    ok_going = ["../media/ok_going_now.mp3"]
-    did_not_understand = ["../media/i_do_not_understand.mp3"]
+    im_listening = ["yes?.mp3"]
+    ok_searching = ["ok_searching.mp3"]
+    ok_going = ["ok_going_now.mp3"]
+    did_not_understand = ["i_do_not_understand.mp3"]
     stopping = ["stopping_now.mp3"]
     nothing = []
 

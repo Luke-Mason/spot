@@ -2,7 +2,6 @@
 
 import random 
 import time
-import numpy as np
 import message_filters
 import rospy
 from common import Listen, Say
@@ -14,6 +13,8 @@ class VoicePlayer():
   def __init__(self):
     demands_topic = rospy.get_param("~demands_topic", "listen")
     say_topic = rospy.get_param("~say_topic", "say")
+    self.path_to_media = rospy.get_param("~path_to_media", "media/")
+
     
     self.demands_pub = rospy.Publisher("/" + demands_topic, String, queue_size=1)
 
@@ -29,9 +30,11 @@ class VoicePlayer():
       self.demands_pub.publish(Listen.command.name)
     if Say[say.data].name == Say.ok_going.name:
       rospy.loginfo("Okay, going now :)")
+      self.demands_pub.publish(Listen.awake.name)
 
     if Say[say.data].name == Say.ok_searching.name:
       rospy.loginfo("Okay, searching now :)")
+      self.demands_pub.publish(Listen.awake.name)
 
     if Say[say.data].name == Say.stopping.name:
       rospy.loginfo("Stopping")
@@ -42,15 +45,12 @@ class VoicePlayer():
       self.demands_pub.publish(Listen.awake.name)
 
     if Say[say.data].name == Say.did_not_understand.name:
-      rospy.loginfo("I dont understand, please say it again.")
+      rospy.loginfo("I don't understand, please say it again.")
       self.demands_pub.publish(self.status)
 
-    if not Say[say.data].value:
-      num = random.randint(0, len(Say[say.data].value))
-      rospy.loginfo("Playing index " + str(num))
-      rospy.loginfo("Playing sound " + str(Say[say.data].value[num]))
-
-      playsound.playsound(Say[say.data].value[num], False)
+    if len(Say[say.data].value) > 0:
+      num = random.randint(0, len(Say[say.data].value) - 1)
+      playsound.playsound(self.path_to_media + "/" + str(Say[say.data].value[num]), False)
 
 
 

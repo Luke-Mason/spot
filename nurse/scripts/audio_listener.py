@@ -59,15 +59,15 @@ class AudioListenerNode():
     self.collected_audio = np.ndarray([])
 
   def start_listening_to_demand(self, listen: String):
+    self.cancel_timer()
+    self.reset_collected_audio()
+
     if listen.data == Listen.awake.name:
-      self.listener_type = "constant"
       return
-      
+
     # Cancel any previous timer.
     # Reset any current task it is listening to. 
     # (Useful for if we say awake call during listening for a response to reset listening)
-    self.cancel_timer()
-    self.reset_collected_audio()
     self.max_samples = Listen[listen.data].value
     self.listener_type = "on_demand"
 
@@ -85,8 +85,6 @@ class AudioListenerNode():
     elif self.listener_type == "none":
       return
 
-    
-      
     # Start/Continue listening if the audio is above threshold.
     if np.max(np.absolute(data)) >= self.threshold:
       if self.status == Status.idle:
@@ -104,12 +102,12 @@ class AudioListenerNode():
 
     # Publish max recording (Stops recording forever if audio constantly above threshold).
     if self.status == Status.listening and self.collected_audio.size >= self.sample_rate * self.max_samples:
-      rospy.loginfo("Publishing max")
       rospy.loginfo(self.collected_audio.size)
       self.publish_audio()
 
   def publish_audio(self):
-    # self.cancel_timer()
+    if self.timer is not None:
+      self.timer.cancel()
 
     # Check that the collected audio is a factor of the sample rate, filling missing slots with 0
     remainder = len(self.collected_audio) % self.sample_rate
@@ -128,7 +126,7 @@ class AudioListenerNode():
     # Set back to constant if changed
     self.listener_type = "constant"
     self.status = Status.idle
-    rospy.loginfo("Sent")
+    rospy.loginfo("IDLE")
 
 
 # def main():
