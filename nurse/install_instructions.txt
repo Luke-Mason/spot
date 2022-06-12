@@ -40,7 +40,12 @@ cd src
 # Clone our github repo into the src folder if you havent already
 git clone https://github.com/Luke-Mason/spot.git
 
-
+Pip3 install yaml
+Pip3 install numpy
+Pip3 install rospkg
+pip3 install dataclasses
+pip3 install transformers
+pip3 install torch torchvision
 # Try to get catkin_make working. You might run into a few errors, try the following commands first: 
 pip install empy
 pip3 install catkin_pkg
