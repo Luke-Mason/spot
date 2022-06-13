@@ -31,6 +31,8 @@ class AudioListenerNode():
     
     # Setup the threshold value dynamically by listening to the environment
     threshold_listen_duration = rospy.get_param("~threshold_listen_duration", 2)
+
+    rospy.loginfo("Setting up threshold ...")
     self.threshold_setup = False
     self.timer = Timer(threshold_listen_duration, self.setup_threshold)
     self.timer.start()
