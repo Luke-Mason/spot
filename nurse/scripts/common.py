@@ -76,7 +76,7 @@ class SayStopping(Say):
 class SayIdoNotUnderstand(Say):
   def __init__(self): # , listen: Listen
     super().__init__("I don't understand, please say it again.", 
-    ["sorry_can_you_say_that_again.wav", "sorry_what_was_that.wav", "what_did_you_say.wav", "I_did_not_catch_that.wav"], None)
+    ["sorry_can_you_say_that_again.wav", "sorry_what_was_that.wav", "what_did_you_say.wav", "i_did_not_catch_that.wav"], None)
 
 class SayNothing(Say):
   def __init__(self):
