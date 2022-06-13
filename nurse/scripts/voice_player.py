@@ -30,7 +30,7 @@ class VoicePlayer():
 if __name__ == '__main__':
 
   # Wait for ROS to start.
-  time.sleep(1)
+  time.sleep(2)
 
   rospy.init_node("Voice Player", log_level=rospy.INFO)
   rospy.loginfo("STARTING VOICE PLAYER")

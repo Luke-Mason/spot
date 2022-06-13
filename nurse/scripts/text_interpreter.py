@@ -63,7 +63,7 @@ class TextInterpreter():
 
     heard_words = translation.data.split()
 
-    rospy.loginfo(heard_words)
+    # rospy.loginfo(heard_words)
 
     if self.listener_status == Listen.awake:
 

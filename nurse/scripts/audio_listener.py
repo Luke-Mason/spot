@@ -28,6 +28,13 @@ class AudioListenerNode():
     self.max_samples = rospy.get_param("~max_samples_per_publish", 4) 
     self.default_max_samples = self.max_samples
     self.sample_rate = rospy.get_param("~sample_rate", 16000)
+    
+    # Setup the threshold value dynamically by listening to the environment
+    threshold_listen_duration = rospy.get_param("~threshold_listen_duration", 2)
+    self.threshold_setup = False
+    self.timer = Timer(threshold_listen_duration, self.setup_threshold)
+    self.timer.start()
+
 
     # Set the change in context.
     listen_sub = message_filters.Subscriber(demands_topic, String)
@@ -53,10 +60,14 @@ class AudioListenerNode():
     self.audio_pub = rospy.Publisher("/" + translate_topic, self.data_class, queue_size=1)
     self.reset_collected_audio()
 
-    self.timer = None
-
   def reset_collected_audio(self):
     self.collected_audio = np.ndarray([])
+
+  def setup_threshold(self):
+    self.threshold = np.max(np.absolute(self.collected_audio))
+    rospy.loginfo("Threshold set to: " + str(self.threshold))
+    self.reset_collected_audio()
+    self.threshold_setup = True
 
   def start_listening_to_demand(self, listen: String):
     self.cancel_timer()
@@ -79,6 +90,9 @@ class AudioListenerNode():
   def listen_to_audio(self, audio_data: AudioData):
     data = np.frombuffer(audio_data.data, dtype=self.audio_type)
     collected_data = np.append(self.collected_audio, data)
+    
+    if self.threshold_setup == False:
+      return
 
     if self.listener_type == "constant":
       self.max_samples = self.default_max_samples
@@ -102,7 +116,7 @@ class AudioListenerNode():
 
     # Publish max recording (Stops recording forever if audio constantly above threshold).
     if self.status == Status.listening and self.collected_audio.size >= self.sample_rate * self.max_samples:
-      rospy.loginfo(self.collected_audio.size)
+      # rospy.loginfo(self.collected_audio.size)
       self.publish_audio()
 
   def publish_audio(self):

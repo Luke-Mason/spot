@@ -98,7 +98,7 @@ class FindLuke(Command):
     super().__init__(Task.find, Target.luke, Sayings.ok_searching)
 
   def perform(self):
-      rospy.loginfo("PERFORMING FIND LUKE")
+    rospy.loginfo("PERFORMING FIND LUKE")
 
 class GoToRoom1(Command):
   def __init__(self):
