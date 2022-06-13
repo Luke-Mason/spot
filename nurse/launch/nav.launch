@@ -1,3 +1,4 @@
 <launch>
+    <include file="$(find spot_driver)/launch/driver.launch"/>
     <node pkg="nurse" name="Navigation" type="nav2.py" output="screen"/>
 </launch>
