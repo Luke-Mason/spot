@@ -1,33 +1,35 @@
 #!/usr/bin/env python3
 
 import time
-import numpy as np
 import message_filters
 import rospy
-from common import Listen, Say
+from common import Commands 
 from std_msgs.msg import String
 
 
 
-class VoicePlayer():
+class Brain():
 
   def __init__(self):
-    demands_topic = rospy.get_param("~demands_topic", "listen")
+    response_topic = rospy.get_param("~response_topic", "response")
+    command_topic = rospy.get_param("~command_topic", "command")
     say_topic = rospy.get_param("~say_topic", "say")
-    
-    self.demands_pub = rospy.Publisher("/" + demands_topic, String, queue_size=1)
 
-    say_sub = message_filters.Subscriber(say_topic, String)
-    say_sub.registerCallback(self.say)
+    self.say_pub = rospy.Publisher("/" + say_topic, String, queue_size=1)
 
-  def say(self, say: String):
-    if Say[say.data].name == Say.im_listening.name:
-      rospy.loginfo("Yes?")
-      self.demands_pub.publish(Listen.command.name)
-    if Say[say.data].name == Say.ok_going.name:
-      rospy.loginfo("Okay, going now :)")
-    if Say[say.data].name == Say.ok_searching.name:
-      rospy.loginfo("Okay, searching now :)")
+    response_sub = message_filters.Subscriber(response_topic, String)
+    response_sub.registerCallback(self.recieved_response)
+
+    command_sub = message_filters.Subscriber(command_topic, String)
+    command_sub.registerCallback(self.recieved_command)
+
+  def recieved_command(self, command: String):
+
+    self.say_pub.publish(Commands[command.data].value.get_say().name)
+
+  def recieved_response(self, response: String):
+    # self.say_pub.publish(Response[response.data].value.get_say().name)
+    rospy.loginfo("recieved response")
 
 
 
@@ -37,7 +39,7 @@ if __name__ == '__main__':
   # Wait for ROS to start.
   time.sleep(1)
 
-  rospy.init_node("Voice Player", log_level=rospy.INFO)
-  rospy.loginfo("STARTING VOICE PLAYER")
-  voice = VoicePlayer()
+  rospy.init_node("Brain", log_level=rospy.INFO)
+  rospy.loginfo("STARTING BRAIN")
+  voice = Brain()
   rospy.spin()

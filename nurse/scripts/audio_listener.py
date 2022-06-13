@@ -114,6 +114,8 @@ class AudioListenerNode():
     if remainder > 0:
       left_over_slots = self.sample_rate - remainder
       self.collected_audio = np.concatenate((self.collected_audio, np.zeros(left_over_slots, dtype=self.audio_type)))
+    
+    # rospy.loginfo(len(self.collected_audio))
 
     # Package the data to send
     array = self.data_class()

@@ -1,5 +1,11 @@
 <launch>
+    <arg name="say_topic" default="say" />
+    <arg name="command_topic" default="command" />
+    <arg name="response_topic" default="response" />
+
     <node pkg="nurse" name="Brain" type="brain.py" output="screen">
-   
+        <param name="say_topic" value="$(arg say_topic)" />
+        <param name="command_topic" value="$(arg command_topic)" />
+        <param name="response_topic" value="$(arg response_topic)" />
     </node>
 </launch>

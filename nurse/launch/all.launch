@@ -26,4 +26,11 @@
         <arg name="say_topic" value="$(arg say_topic)" />
         <arg name="path_to_media" value="../workspace/aiil_workspace/noetic_workspace/src/spot/nurse/media" />
     </include>
+
+    <!-- Launch Brain node for Spot -->
+    <include file="$(find nurse)/launch/brain.launch" >
+        <arg name="say_topic" value="$(arg say_topic)" />
+        <arg name="command_topic" value="$(arg command_topic)" />
+        <arg name="response_topic" value="$(arg response_topic)" />
+    </include>    
 </launch>
