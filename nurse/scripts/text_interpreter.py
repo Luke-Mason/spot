@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-import string
 import time
 import rospy
 import message_filters
 from std_msgs.msg import String
-from common import Command, Listen, Say, Calls, SayQuestionYes
+from common import Command, Commands, Listen, Sayings, Task
 
 
 class TextInterpreter():
@@ -37,63 +36,59 @@ class TextInterpreter():
     self.response_pub = rospy.Publisher("/" + response_topic, String, queue_size=1)
     self.say_pub = rospy.Publisher("/" + say_topic, String, queue_size=1)
 
-  def check_call_called(self, call_phrase, heard_words):
+  def check_task_matches(self, task: Task, heard_words):
+    for phrase in task.value:
+      if self.check_phrase_called(phrase, heard_words):
+        return True
+    
+    return False
+  
+  def check_phrase_called(self, phrase: str, heard_words):
 
     # If all words in phrase are found in the heard words in order then return True
     current_index = 0
 
     # Check that the series of words are all existent in order.
-    for word in call_phrase.split():
+    for word in phrase.split():
       if word not in heard_words[current_index:]:
         return False
-
-      current_index = heard_words.index(word)
     
+      current_index = heard_words.index(word)
     return True      
 
   def build_understanding(self, translation: String):
     if len(translation.data) == 0:
-      self.say_pub.publish(Say.nothing.name)
+      self.say_pub.publish(Sayings.nothing.name)
       return
 
-    # self.heard_words.extend(translation.data.split())
     heard_words = translation.data.split()
+
+    rospy.loginfo(heard_words)
 
     if self.listener_status == Listen.awake:
 
       # Check if it is the awake command
-      for call_phrase in Calls.awake.value:
-        result = self.check_call_called(call_phrase, heard_words)
-        if result:
-          self.say_pub.publish(SayQuestionYes().name)
-          return
+      if self.check_task_matches(Task.awake, heard_words):
+        self.say_pub.publish(Sayings.im_listening.name)
+      
+      return
 
     elif self.listener_status == Listen.command:
-
-      for call_phrase in Calls.stop.value:
-        result = self.check_call_called(call_phrase, heard_words)
-        if result:
-          return
- 
-      for call_phrase in Calls.find.value:
-        result = self.check_call_called(call_phrase, heard_words)
-        if result:
-
+      
+      # Check all commands for matching words then run that command if found.
+      for command_enum in Commands:
+        command: Command = command_enum.value
+        if self.check_task_matches(command.get_task_enum(), heard_words):
+          self.command_pub.publish(command_enum.name)
           return
 
-      for call_phrase in Calls.go_to.value:
-        result = self.check_call_called(call_phrase, heard_words)
-        if result:
-          return
+      self.say_pub.publish(Sayings.i_do_not_understand.name)
 
     elif self.listener_status == Listen.response:
-      for call_phrase in Calls.go_to.value:
-        result = self.check_call_called(call_phrase, heard_words)
-        if result:
-          return
+      rospy.loginfo("Check for a valid response")
+      self.say_pub.publish(Sayings.i_do_not_understand.name)
     
-    self.say_pub.publish(Say.did_not_understand.name)
-      
+
 
     # if len(self.heard_words) > self.max_words:
     #   self.heard_words = self.heard_words[len(self.heard_words) - self.max_words:]

@@ -26,43 +26,45 @@ class Listen(Enum):
     command = 4
 
 class Say():
-  def __init__(self, msg, path_to_media: str, audio_files, listen: Listen):
+  def __init__(self, msg: str, audio_files, listen: Listen = Listen.awake):
     self.msg = msg
-    self.path_to_media = path_to_media
-    self.audio_paths = audio_files
+    self.audio_files = audio_files
     self.listen = listen
 
-  def perform(self, listen_pub: rospy.Publisher = None):
-    if len(self.audio_paths) > 0:
-      num = random.randint(0, len(self.audio_paths) - 1)
-      playsound.playsound(self.path_to_media + "/" + str(self.say.value[num]), False)
+  def get_listen(self):
+    return self.listen
 
-    if listen_pub is not None:
-      listen_pub.publish(self.listen.name)
+  def run(self, path_to_media: str, listen_pub: rospy.Publisher, prev_listen_status: Listen):
+    if len(self.audio_files) > 0:
+      num = random.randint(0, len(self.audio_files) - 1)
+      path = path_to_media + "/" + str(self.audio_files[num])
+      rospy.loginfo(path)
+      playsound.playsound(path, True)
+      listen_pub.publish(prev_listen_status.name if self.listen is None else self.listen.name)
 
 class SayImListening(Say):
-  def __init__(self, path_to_media: str):
-    super().__init__("Yes?", path_to_media, ["yes?.mp3"], Listen.command)
+  def __init__(self):
+    super().__init__("Yes?", ["yes?.mp3"], Listen.command)
 
 class SayImSearching(Say):
-  def __init__(self, path_to_media: str):
-    super().__init__("Okay, Searching :)", path_to_media, ["ok_searching.mp3"])
+  def __init__(self):
+    super().__init__("Okay, Searching :)", ["ok_searching.mp3"], Listen.awake)
 
 class SayImGoing(Say):
-  def __init__(self, path_to_media: str):
-    super().__init__("Okay, going now!", path_to_media, ["ok_going_now.mp3"])
+  def __init__(self):
+    super().__init__("Okay, going now!", ["ok_going_now.mp3"], Listen.awake)
 
 class SayStopping(Say):
-  def __init__(self, path_to_media: str):
-    super().__init__("Stopped", path_to_media, ["stopping_now.mp3"])
+  def __init__(self):
+    super().__init__("Stopped", ["stopping_now.mp3"], Listen.awake)
 
 class SayIdoNotUnderstand(Say):
-  def __init__(self, path_to_media: str, listen: Listen):
-    super().__init__("I don't understand, please say it again.", path_to_media, ["i_do_not_understand.mp3"], listen)
+  def __init__(self): # , listen: Listen
+    super().__init__("I don't understand, please say it again.", ["i_do_not_understand.mp3"], None)
 
 class SayNothing(Say):
   def __init__(self):
-    super().__init__("", [])
+    super().__init__("", [], Listen.awake)
 
 
 class Sayings(Enum):
@@ -80,26 +82,37 @@ class Command():
     self.target = target
     self.saying = saying
 
-  def run(self):
+  def get_task_enum(self):
+    return self.task
+
+  def perform(self):
     pass
 
-  def perform(self, path_to_media, listen_pub: rospy.Publisher):
-    self.run()
-    self.saying.perform(path_to_media, listen_pub)
+  def run(self, say_pub: rospy.Publisher):
+    self.perform()
+    say_pub.publish(self.saying.name)
     
 
 class FindLuke(Command):
   def __init__(self):
     super().__init__(Task.find, Target.luke, Sayings.ok_searching)
 
+  def perform(self):
+      rospy.loginfo("PERFORMING FIND LUKE")
+
 class GoToRoom1(Command):
   def __init__(self):
     super().__init__(Task.go_to, Target.room_1, Sayings.ok_going)
-    
+  
+  def perform(self):
+    rospy.loginfo("PERFORMING GO TO ROOM 1")
+
 class Stop(Command):
   def __init__(self):
-    super().__init__(Task.stop, say=Sayings.stopping)
+    super().__init__(Task.stop, saying=Sayings.stopping)
 
+  def perform(self):
+    rospy.loginfo("PERFORMING STOP")
 
 class Commands(Enum):
   go_to_room_1 = GoToRoom1()

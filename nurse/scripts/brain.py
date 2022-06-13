@@ -3,7 +3,7 @@
 import time
 import message_filters
 import rospy
-from common import Commands 
+from common import Command, Commands 
 from std_msgs.msg import String
 
 
@@ -24,8 +24,8 @@ class Brain():
     command_sub.registerCallback(self.recieved_command)
 
   def recieved_command(self, command: String):
-
-    self.say_pub.publish(Commands[command.data].value.get_say().name)
+    command: Command = Commands[command.data].value
+    command.run(self.say_pub)
 
   def recieved_response(self, response: String):
     # self.say_pub.publish(Response[response.data].value.get_say().name)

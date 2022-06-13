@@ -3,7 +3,7 @@
 import time
 import message_filters
 import rospy
-from common import Say
+from common import Listen, Say, Sayings
 from std_msgs.msg import String
 
 class VoicePlayer():
@@ -17,12 +17,16 @@ class VoicePlayer():
 
     say_sub = message_filters.Subscriber(say_topic, String)
     say_sub.registerCallback(self.say)
+    self.prev_listen_status = Listen.awake
 
-  def say(self, say_name: String):
-    Say[say_name.data].perform(self.demands_pub)
+  def say(self, saying_name: String):
+    rospy.loginfo(saying_name.data)
+    say: Say = Sayings[saying_name.data].value
+    say.run(self.path_to_media, self.demands_pub, self.prev_listen_status)
+    if say.get_listen() is not None:
+      self.prev_listen_status = say.get_listen()
 
 
-# def main():
 if __name__ == '__main__':
 
   # Wait for ROS to start.
