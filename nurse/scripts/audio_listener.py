@@ -16,14 +16,13 @@ Status = Enum("Status", "listening idle")
 class AudioListenerNode():
 
   def __init__(self):
-    self.listener_type = rospy.get_param("~listener_type", "constant")
+    self.listener = Listen.awake
     translate_topic = rospy.get_param("~translate_topic", "translate")
     audio_topic = rospy.get_param("~audio_topic", "audio")
     demands_topic = rospy.get_param("~demands_topic", "listen")
 
+    self.threshold_boost_multiplier = rospy.get_param("~threshold_boost_multiplier", 1.5)
     self.idle_wait_time = rospy.get_param("~idle_wait_time", 0.5)
-    self.max_samples = rospy.get_param("~max_samples_per_publish", 4) 
-    self.default_max_samples = self.max_samples
     self.sample_rate = rospy.get_param("~sample_rate", 16000)
     
     # Setup the threshold value dynamically by listening to the environment
@@ -63,7 +62,7 @@ class AudioListenerNode():
     self.collected_audio = np.ndarray([])
 
   def setup_threshold(self):
-    self.threshold = np.max(np.absolute(self.collected_audio))
+    self.threshold = np.max(np.absolute(self.collected_audio)) * self.threshold_boost_multiplier
     rospy.loginfo("Threshold set to: " + str(self.threshold))
     self.reset_collected_audio()
     self.threshold_setup = True
@@ -75,12 +74,8 @@ class AudioListenerNode():
     # (Useful for if we say awake call during listening for a response to reset listening)
     self.cancel_timer()
     self.reset_collected_audio()
-
-    if listen.data == Listen.awake.name:
-      return
-
-    self.max_samples = Listen[listen.data].value
-    self.listener_type = "on_demand"
+    self.listener = Listen[listen.data]
+    self.status = Status.idle
 
   def cancel_timer(self):
     if self.timer is not None:
@@ -91,13 +86,10 @@ class AudioListenerNode():
     data = np.frombuffer(audio_data.data, dtype=self.audio_type)
     collected_data = np.append(self.collected_audio, data)
     
-    if self.threshold_setup == False:
+    if self.threshold_setup == False or self.listener == Listen.paused:
       return
 
-    if self.listener_type == "constant":
-      self.max_samples = self.default_max_samples
-    elif self.listener_type == "none":
-      return
+    max_samples = self.listener.value
 
     # Start/Continue listening if the audio is above threshold.
     if np.max(np.absolute(data)) >= self.threshold:
@@ -115,7 +107,7 @@ class AudioListenerNode():
       self.collected_audio = collected_data
 
     # Publish max recording (Stops recording forever if audio constantly above threshold).
-    if self.status == Status.listening and self.collected_audio.size >= self.sample_rate * self.max_samples:
+    if self.status == Status.listening and self.collected_audio.size >= self.sample_rate * max_samples:
       # rospy.loginfo(self.collected_audio.size)
       self.publish_audio()
 
@@ -140,7 +132,6 @@ class AudioListenerNode():
     self.reset_collected_audio()
 
     # Set back to constant if changed
-    self.listener_type = "constant"
     self.status = Status.idle
     rospy.loginfo("IDLE")
 

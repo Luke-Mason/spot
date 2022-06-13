@@ -6,9 +6,10 @@
     <arg name="translation_topic" default="translation" />
 
     <!-- Launch Hardware -->
+    <!-- <include file="$(find spot_driver)/launch/driver.launch"/> -->
 
     <!-- Launch Mapping & Navigation-->
-    <include file="$(find nurse)/launch/nav.launch"/>
+    <!-- <include file="$(find nurse)/launch/nav.launch"/> -->
        
     <!-- Launch Object Detection -->
 

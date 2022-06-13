@@ -48,12 +48,13 @@ class TextInterpreter():
     # If all words in phrase are found in the heard words in order then return True
     current_index = 0
 
-    # Check that the series of words are all existent in order.
-    for word in phrase.split():
-      if word not in heard_words[current_index:]:
+    # Check that the series of words are all existent in order. (This allows for substrings to be matches as well)
+    for sub_word in phrase.split():
+      found = [word for word in heard_words[current_index:] if sub_word in word]
+      if not found:
         return False
     
-      current_index = heard_words.index(word)
+      current_index = heard_words.index(found[-1])
     return True      
 
   def build_understanding(self, translation: String):
@@ -62,8 +63,6 @@ class TextInterpreter():
       return
 
     heard_words = translation.data.split()
-
-    # rospy.loginfo(heard_words)
 
     if self.listener_status == Listen.awake:
 
@@ -87,11 +86,6 @@ class TextInterpreter():
     elif self.listener_status == Listen.response:
       rospy.loginfo("Check for a valid response")
       self.say_pub.publish(Sayings.i_do_not_understand.name)
-    
-
-
-    # if len(self.heard_words) > self.max_words:
-    #   self.heard_words = self.heard_words[len(self.heard_words) - self.max_words:]
     
   def set_listen(self, listener_status: String):
     self.listener_status = Listen[listener_status.data]

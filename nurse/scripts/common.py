@@ -1,7 +1,8 @@
 from enum import Enum
-import playsound
 import random
 import rospy
+import simpleaudio as sa
+import pydub
 
 
 class Location(Enum):
@@ -24,9 +25,10 @@ class Listen(Enum):
     response = 4
     awake = 2
     command = 4
+    paused = 0
 
 class Say():
-  def __init__(self, msg: str, audio_files, listen: Listen = Listen.awake):
+  def __init__(self, msg: str, audio_files, listen: Listen):
     self.msg = msg
     self.audio_files = audio_files
     self.listen = listen
@@ -38,29 +40,42 @@ class Say():
     if len(self.audio_files) > 0:
       num = random.randint(0, len(self.audio_files) - 1)
       path = path_to_media + "/" + str(self.audio_files[num])
-      rospy.loginfo(path)
-      playsound.playsound(path, True)
+
+      # Pause the microphone listeners
+      listen_pub.publish(Listen.paused.name)
+
+      sound = pydub.AudioSegment.from_wav(path)
+      playback = sa.play_buffer(
+          sound.raw_data, 
+          num_channels=sound.channels, 
+          bytes_per_sample=sound.sample_width, 
+          sample_rate=sound.frame_rate
+          )
+      playback.wait_done()
+      rospy.timer.sleep(0.5)
+
+      # Continue listening
       listen_pub.publish(prev_listen_status.name if self.listen is None else self.listen.name)
 
 class SayImListening(Say):
   def __init__(self):
-    super().__init__("Yes?", ["yes?.mp3"], Listen.command)
+    super().__init__("Yes?", ["yes?.wav"], Listen.command)
 
 class SayImSearching(Say):
   def __init__(self):
-    super().__init__("Okay, Searching :)", ["ok_searching.mp3"], Listen.awake)
+    super().__init__("Okay, Searching :)", ["ok_searching.wav"], Listen.awake)
 
 class SayImGoing(Say):
   def __init__(self):
-    super().__init__("Okay, going now!", ["ok_going_now.mp3"], Listen.awake)
+    super().__init__("Okay, going now!", ["ok_going_now.wav"], Listen.awake)
 
 class SayStopping(Say):
   def __init__(self):
-    super().__init__("Stopped", ["stopping_now.mp3"], Listen.awake)
+    super().__init__("Stopped", ["stopping_now.wav"], Listen.awake)
 
 class SayIdoNotUnderstand(Say):
   def __init__(self): # , listen: Listen
-    super().__init__("I don't understand, please say it again.", ["i_do_not_understand.mp3"], None)
+    super().__init__("I don't understand, please say it again.", ["i_do_not_understand.wav"], None)
 
 class SayNothing(Say):
   def __init__(self):
