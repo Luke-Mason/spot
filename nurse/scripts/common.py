@@ -59,23 +59,24 @@ class Say():
 
 class SayImListening(Say):
   def __init__(self):
-    super().__init__("Yes?", ["yes?.wav"], Listen.command)
+    super().__init__("Yes?", ["yes.wav", "huh.wav", "uhuh.wav", "yes_what_is_it.wav"], Listen.command)
 
 class SayImSearching(Say):
   def __init__(self):
-    super().__init__("Okay, Searching :)", ["ok_searching.wav"], Listen.awake)
+    super().__init__("Okay, Searching :)", ["ok_searching.wav", "finding_them_now.wav"], Listen.awake)
 
 class SayImGoing(Say):
   def __init__(self):
-    super().__init__("Okay, going now!", ["ok_going_now.wav"], Listen.awake)
+    super().__init__("Okay, going now!", ["ok_going.wav", "moving_now.wav", "ok_on_my_way.wav"], Listen.awake)
 
 class SayStopping(Say):
   def __init__(self):
-    super().__init__("Stopped", ["stopping_now.wav"], Listen.awake)
+    super().__init__("Stopped", ["stopping_now.wav", "stopping.wav", "okay.wav"], Listen.awake)
 
 class SayIdoNotUnderstand(Say):
   def __init__(self): # , listen: Listen
-    super().__init__("I don't understand, please say it again.", ["i_do_not_understand.wav"], None)
+    super().__init__("I don't understand, please say it again.", 
+    ["sorry_can_you_say_that_again.wav", "sorry_what_was_that.wav", "what_did_you_say.wav"], None)
 
 class SayNothing(Say):
   def __init__(self):
