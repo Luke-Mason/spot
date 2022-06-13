@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from io import StringIO
-from sys import byteorder
 import time
 import numpy as np
 import message_filters

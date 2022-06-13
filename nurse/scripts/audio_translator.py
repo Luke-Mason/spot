@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from dataclasses import dataclass
 import time
 import numpy as np
 import message_filters
