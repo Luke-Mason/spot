@@ -23,7 +23,6 @@ class AudioListenerNode():
     audio_topic = rospy.get_param("~audio_topic", "audio")
     demands_topic = rospy.get_param("~demands_topic", "listen")
 
-    self.threshold = rospy.get_param("~threshold", 0.007)
     self.idle_wait_time = rospy.get_param("~idle_wait_time", 0.5)
     self.max_samples = rospy.get_param("~max_samples_per_publish", 4) 
     self.default_max_samples = self.max_samples
@@ -32,7 +31,7 @@ class AudioListenerNode():
     # Setup the threshold value dynamically by listening to the environment
     threshold_listen_duration = rospy.get_param("~threshold_listen_duration", 2)
 
-    rospy.loginfo("Setting up threshold ...")
+    rospy.loginfo("Setting up audio threshold ...")
     self.threshold_setup = False
     self.timer = Timer(threshold_listen_duration, self.setup_threshold)
     self.timer.start()
@@ -72,15 +71,16 @@ class AudioListenerNode():
     self.threshold_setup = True
 
   def start_listening_to_demand(self, listen: String):
+    
+    # Cancel any previous timer.
+    # Reset any current task it is listening to. 
+    # (Useful for if we say awake call during listening for a response to reset listening)
     self.cancel_timer()
     self.reset_collected_audio()
 
     if listen.data == Listen.awake.name:
       return
 
-    # Cancel any previous timer.
-    # Reset any current task it is listening to. 
-    # (Useful for if we say awake call during listening for a response to reset listening)
     self.max_samples = Listen[listen.data].value
     self.listener_type = "on_demand"
 
