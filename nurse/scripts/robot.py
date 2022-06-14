@@ -10,6 +10,9 @@ import rospy
 import argparse
 from bosdyn.client.spot_cam.audio import AudioClient
 from bosdyn.api.spot_cam import audio_pb2
+from bosdyn.client import spot_cam
+import os
+
 # class Spot():
 #     spot = None
 #     robot = None
@@ -43,14 +46,21 @@ if __name__ == '__main__':
     #   spot = Spot.get_robot()
 
     mysdk = bosdyn.client.create_standard_sdk('nurse-spot')
-    robot: Robot = mysdk.create_robot('192.168.80.3')
-    robot.authenticate('admin', 'eco1nifqyn99')
+    spot_cam.register_all_service_clients(mysdk)
+    robot: Robot = mysdk.create_robot(os.environ["BOSDYN_CLIENT_IP"])
+    robot.authenticate(os.environ["BOSDYN_CLIENT_USERNAME"], os.environ["BOSDYN_CLIENT_PASSWORD"])
+
+
     # robot.regi()
-    state_client = robot.ensure_client('robot-state')
-    id_client = robot.get_cached_robot_id()
-    rospy.loginfo(id_client)
+    # state_client = robot.ensure_client('robot-state')
+    # id_client = robot.get_cached_robot_id()
+    # rospy.loginfo(id_client)
 
     audio_client: AudioClient = robot.ensure_client("spot-cam-audio")
+
+    channel = audio_client.get_audio_capture_channel()
+    rospy.loginfo(channel)
+
     # audio_client
 
     # lease_client = robot.ensure_client('lease')
@@ -62,18 +72,14 @@ if __name__ == '__main__':
     # time.sleep(3)
     # rospy.loginfo(robot.list_services())
 
-    # path_to_file = "../workspace/aiil_workspace/noetic_workspace/src/spot/nurse/media/hello.wav"
+    path_to_file = "../workspace/aiil_workspace/noetic_workspace/src/spot/nurse/media/hello.wav"
+    sound = audio_pb2.Sound(name="hello")
+    with open(path_to_file, 'rb') as fh:
+        data = fh.read()
+    audio_client.load_sound(sound, data)
 
-    # sound = audio_pb2.Sound(name="hello")
-    # with open(path_to_file, 'rb') as fh:
-    #     data = fh.read()
-    # robot.ensure_client(AudioClient.default_service_name).load_sound(sound, data)
-
-    # sound = audio_pb2.Sound(name="hello")
-    # gain = 0
-    # if gain:
-    #     gain = max(gain, 0.0)
-    # robot.ensure_client(AudioClient.default_service_name).play_sound(sound, gain)
+    sound = audio_pb2.Sound(name="hello")
+    audio_client.play_sound(sound, 5)
 
     # rospy.loginfo(json.dump(lease_client.list_leases()))
     # rospy.loginfo(json.dump(state_client.get_robot_state()))
