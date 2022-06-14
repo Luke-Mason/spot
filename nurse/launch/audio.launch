@@ -1,4 +1,9 @@
 <launch>
+
+    <!-- Connected to Spot or not -->
+    <arg name="spot_enabled" default="False"/>
+
+    <!-- Audio Settings -->
     <arg name="sample_rate" default="16000"/>
     <arg name="sample_format" default="F32LE"/>
     <arg name="bitrate" default="128"/>
@@ -16,14 +21,16 @@
     <arg name="response_topic" default="response" />
 
     <!-- Captures Audio and publishes it. -->
-    <node name="audio_capture" pkg="audio_capture" type="audio_capture" output="screen">
-        <param name="device" value="$(arg device)" />
-        <param name="format" value="wave" />
-        <param name="channels" value="1" />
-        <param name="depth" value="$(arg depth)" />
-        <param name="sample_rate" value="$(arg sample_rate)" />
-        <param name="sample_format" value="$(arg sample_format)" />
-    </node>
+    <group if="$(eval spot_enabled == 'False')">
+        <node name="audio_capture" pkg="audio_capture" type="audio_capture" output="screen">
+            <param name="device" value="$(arg device)" />
+            <param name="format" value="wave" />
+            <param name="channels" value="1" />
+            <param name="depth" value="$(arg depth)" />
+            <param name="sample_rate" value="$(arg sample_rate)" />
+            <param name="sample_format" value="$(arg sample_format)" />
+        </node>
+    </group>
 
     <!-- Audio listener that listens to audio published and converts audio byte data into audio input for translator -->
     <node pkg="nurse" name="Listener" type="audio_listener.py" output="screen">

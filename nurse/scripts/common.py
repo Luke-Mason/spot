@@ -36,7 +36,7 @@ class Say():
   def get_listen(self):
     return self.listen
 
-  def run(self, path_to_media: str, listen_pub: rospy.Publisher, prev_listen_status: Listen):
+  def run(self, path_to_media: str, listen_pub: rospy.Publisher, prev_listen_status: Listen, spot_enabled: bool):
     if len(self.audio_files) > 0:
       num = random.randint(0, len(self.audio_files) - 1)
       path = path_to_media + "/" + str(self.audio_files[num])
@@ -44,14 +44,20 @@ class Say():
       # Pause the microphone listeners
       listen_pub.publish(Listen.paused.name)
 
-      sound = pydub.AudioSegment.from_wav(path)
-      playback = sa.play_buffer(
-          sound.raw_data, 
-          num_channels=sound.channels, 
-          bytes_per_sample=sound.sample_width, 
-          sample_rate=sound.frame_rate
-          )
-      playback.wait_done()
+      if spot_enabled:
+        pass
+        # play_sound()
+      else:
+        sound = pydub.AudioSegment.from_wav(path)
+        playback = sa.play_buffer(
+            sound.raw_data, 
+            num_channels=sound.channels, 
+            bytes_per_sample=sound.sample_width, 
+            sample_rate=sound.frame_rate
+            )
+        playback.wait_done()
+
+      # Sleep because listener heard the last bit of audio and caused infinite loop of it talking to itself.
       rospy.timer.sleep(0.5)
 
       # Continue listening
@@ -83,6 +89,7 @@ class SayNothing(Say):
     super().__init__("", [], Listen.awake)
 
 
+# TODO make custom ros msg instead of this enum facade that is using String. Make Say msg.
 class Sayings(Enum):
   im_listening = SayImListening()
   stopping = SayStopping()
@@ -130,6 +137,7 @@ class Stop(Command):
   def perform(self):
     rospy.loginfo("PERFORMING STOP")
 
+# TODO make custom ros msg instead of this enum facade that is using String. Make Command msg
 class Commands(Enum):
   go_to_room_1 = GoToRoom1()
   find_luke = FindLuke()
