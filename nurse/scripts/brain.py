@@ -62,6 +62,8 @@ class Brain():
       self.status = status
       if status == 3:
           rospy.loginfo("\n\nGoal reached\n\n")
+          
+          
           self.send_to_goal(self.navigate_to, self.initial_localization_waypoint, self.do_nothing)
           return "Done"
       if status == 2 or status == 8:

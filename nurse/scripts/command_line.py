@@ -92,8 +92,8 @@ def main(args=None):
 
 
 if __name__ == '__main__':
-    time.sleep(2)
-    rospy.init_node("Vision", log_level=rospy.INFO)
-    rospy.loginfo("STARTING Vision Service")
+    #time.sleep(2)
+    #rospy.init_node("Vision", log_level=rospy.INFO)
+    #rospy.loginfo("STARTING Vision Service")
 
     main()
