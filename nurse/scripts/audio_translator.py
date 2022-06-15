@@ -11,7 +11,7 @@ from std_msgs.msg import String, Float32MultiArray, UInt8MultiArray
 class AudioTranslator():
 
   def __init__(self):
-    receive_from = rospy.get_param("~receive_from", "audio/translate")
+    receive_from = rospy.get_param("~receive_from", "translate")
     send_to = rospy.get_param("~send_to", "translation")
     pretrained_model_name_or_path = rospy.get_param("~pretrained_model_name_or_path", "facebook/wav2vec2-base-960h")
 

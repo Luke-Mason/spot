@@ -4,15 +4,7 @@
     <arg name="command_topic" default="command" />
     <arg name="response_topic" default="response" />
     <arg name="translation_topic" default="translation" />
-
-    <!-- Launch Hardware -->
-    <!-- <include file="$(find spot_driver)/launch/driver.launch"/> -->
-
-    <!-- Launch Mapping & Navigation-->
-    <!-- <include file="$(find nurse)/launch/nav.launch"/> -->
-       
-    <!-- Launch Object Detection -->
-
+    
     <!-- Launch Audio Interpretation -->
     <include file="$(find nurse)/launch/audio.launch" >
         <arg name="demands_topic" value="$(arg demands_topic)"/>  
@@ -27,6 +19,7 @@
         <arg name="demands_topic" value="$(arg demands_topic)"/>  
         <arg name="say_topic" value="$(arg say_topic)" />
         <arg name="path_to_media" value="../workspace/aiil_workspace/noetic_workspace/src/spot/nurse/media" />
+        <!-- <arg name="path_to_media" value="../catkin_ws/src/nurse/media" /> -->
     </include>
 
     <!-- Launch Brain node for Spot -->
