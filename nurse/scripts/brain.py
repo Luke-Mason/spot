@@ -69,6 +69,7 @@ class Brain():
       self.status = status
       if status == 3:
           rospy.loginfo("\n\nGoal reached\n\n")
+          subprocess.run(["python3", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "webrtc", "save", "--count", "0"])
           rospy.loginfo(time.time())
           self.spin_camera()
           rospy.loginfo(time.time())

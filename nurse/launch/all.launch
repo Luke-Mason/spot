@@ -15,7 +15,7 @@
     </include>
     
     <!-- Launch Vision for Spot -->
-    <include file="$(find nurse)/launch/vision.launch" />
+    <!--<include file="$(find nurse)/launch/vision.launch" />-->
 
     <!-- Launch Voice for Spot -->
     <include file="$(find nurse)/launch/voice.launch" >
