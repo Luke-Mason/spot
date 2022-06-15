@@ -8,7 +8,7 @@ class Target(Enum):
 
 class Task(Enum):
     find = ["FIND", "FI ND", "IND"]
-    go_to = ["GO ROOM", "GO RUM", "GO RUME"]
+    go_to = ["GO", "GI", "GA"]
     spot = ["SPOT", "SPO OT", "SPOOT"]
     stop = ["STOP", "ST OP", "S TOP", "STO P", "BOUT", "SPOIT" "NO", "NOTHING", "ATHING"]
     hello = ["HELLO", "ELLO", "HEY", "IY", "HELEN", "ALLO"]
@@ -117,7 +117,7 @@ class Stop(Command):
 
 # TODO make custom ros msg instead of this enum facade that is using String. Make Command msg
 class Commands(Enum):
-  go_to_room_1 = GoToRoom()
+  go_room = GoToRoom()
   find_luke = FindLuke()
   stop = Stop()
   hello = Hello()

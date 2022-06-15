@@ -37,10 +37,10 @@ class Spot_Nav():
 
         # Creating the goal object
         navigate_goal = NavigateToGoal()
-        navigate_goal.upload_path = "/home/ramji/Desktop/map_folder/downloaded_graph"
-        navigate_goal.navigate_to = "hm"
+        navigate_goal.upload_path = "/home/rmitaiil/Desktop/map_folder/downloaded_graph"
+        navigate_goal.navigate_to = "fc"
         navigate_goal.initial_localization_fiducial= False
-        navigate_goal.initial_localization_waypoint = "tb"
+        navigate_goal.initial_localization_waypoint = "ka"
 
         # SENDING THE GOAL
 
