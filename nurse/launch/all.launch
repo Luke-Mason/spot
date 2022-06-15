@@ -13,6 +13,9 @@
         <arg name="response_topic" value="$(arg response_topic)" />
         <arg name="translation_topic" value="$(arg translation_topic)" />
     </include>
+    
+    <!-- Launch Vision for Spot -->
+    <include file="$(find nurse)/launch/vision.launch" >
 
     <!-- Launch Voice for Spot -->
     <include file="$(find nurse)/launch/voice.launch" >
