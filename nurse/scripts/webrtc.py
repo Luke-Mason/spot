@@ -30,18 +30,20 @@ from webrtc_client import WebRTCClient
 import colorsys
 import os
 
-import tensorflow as tf
+#import tensorflow as tf
 
-from keras import backend as K
-from keras.models import load_model
-from tensorflow.python.framework.ops import disable_eager_execution
+#from keras import backend as K
+#from keras.models import load_model
+#from tensorflow.python.framework.ops import disable_eager_execution
+
+import face_recognition
 
 #import urllib3
 #urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-disable_eager_execution()
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+#disable_eager_execution()
+#os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 logging.basicConfig(level=logging.DEBUG, filename='webrtc.log', filemode='a+')
 STDERR = logging.getLogger('stderr')
@@ -472,7 +474,7 @@ async def process_frame(client, options, shutdown_flag):
     count = 0
     print("In process func")
     print("attempting to create yolo object")
-    yolo = YOLO()
+    #yolo = YOLO()
 
     print("yolo object created")
     # set start time to current time
@@ -497,11 +499,45 @@ async def process_frame(client, options, shutdown_flag):
                 
                 frame = cv2.resize(cv_image, None, fx=1.0, fy=1.0, interpolation=cv2.INTER_AREA)
                 # detect object on our frame
-                r_image, ObjectsList = yolo.detect_img(frame)
+                #r_image, ObjectsList = yolo.detect_img(frame)
                 
                 # show us frame with detection
-                cv2.imshow("Web cam input", r_image)
-                #cv2.imshow('display', cv_image)
+                #cv2.imshow("Web cam input", r_image)
+                known_image = face_recognition.load_image_file("images/dev.jpg")
+
+                face_locations = face_recognition.face_locations(known_image)
+
+                # Get the single face encoding out of elon-musk-1.jpg
+                face_location = face_locations[0]  # Only use the first detected face
+                face_encodings = face_recognition.face_encodings(known_image, [face_location])
+                elon_musk_knwon_face_encoding_1 = face_encodings[0]  # Pull out the one returned face encoding
+
+
+                # Load the image with unknown to compare
+                #image = face_recognition.load_image_file("cover2.jpg")  # Load the image we are comparing
+                unknwon_face_encodings = face_recognition.face_encodings(cv_image)
+
+                # Loop over each unknwon face encoding to see if the face matches either known encodings
+                #print('Matches for elon-musk-in-group.jpg')
+                matches = []
+                for unknwon_face_encoding in unknwon_face_encodings:
+                    matches.append(face_recognition.compare_faces(
+                        [elon_musk_knwon_face_encoding_1],  # The known face encodings (can be only 1 - less is faster)
+                        unknwon_face_encoding  # The single unknown face encoding
+                    ))
+                    #print(matches)
+
+                print(matches)
+                face_locations = face_recognition.face_locations(cv_image)
+                print(face_locations)
+
+
+                for i in range(len(matches)):
+                    if matches[i][0] == True:
+                        print("Image found at location: " + str(face_locations[i]))
+                        print()
+
+                cv2.imshow('display', cv_image)
                 if cv2.waitKey(25) & 0xFF == ord("q"):
                     cv2.destroyAllWindows()
                     break
