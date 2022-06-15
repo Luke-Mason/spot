@@ -16,7 +16,7 @@ class Target(Enum):
 
 class Task(Enum):
     find = ["FIND", "FI ND", "IND"]
-    go_to = ["GO", "GOO", "G OO", "G O"]
+    go_to = ["GO TO ROOM", "GO TWO ROOM", "GO TI ROOM"]
     # check = ["CHECK"]
     awake = ["SPOT", "SPO OT", "SPOOT"]
     stop = ["STOP", "ST OP", "S TOP", "STO P"]
