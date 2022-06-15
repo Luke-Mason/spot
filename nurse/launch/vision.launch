@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="nurse" name="Vision" type="vision_wrapper.py" output="screen"/>
+</launch>

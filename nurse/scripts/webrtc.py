@@ -503,6 +503,9 @@ async def process_frame(client, options, shutdown_flag):
                 
                 # show us frame with detection
                 #cv2.imshow("Web cam input", r_image)
+
+
+
                 known_image = face_recognition.load_image_file("images/dev.jpg")
 
                 face_locations = face_recognition.face_locations(known_image)
@@ -536,6 +539,8 @@ async def process_frame(client, options, shutdown_flag):
                     if matches[i][0] == True:
                         print("Image found at location: " + str(face_locations[i]))
                         print()
+
+                        
 
                 cv2.imshow('display', cv_image)
                 if cv2.waitKey(25) & 0xFF == ord("q"):
