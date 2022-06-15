@@ -49,7 +49,14 @@ class Brain():
       rospy.loginfo("Current location: " + str(feedback))
 
   def do_nothing(self, status, result):
-    pass
+    self.status = status
+    if status == 3:
+        rospy.loginfo("\n\nGoal reached\n\n")
+        return "Done"
+    if status == 2 or status == 8:
+        rospy.loginfo("Goal cancelled")
+    if status == 4:
+        rospy.loginfo("Goal aborted")
 
   def done_cb(self, status, result):
       self.status = status
