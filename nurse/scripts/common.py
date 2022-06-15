@@ -1,25 +1,16 @@
 from enum import Enum
-import random
 import rospy
-import simpleaudio as sa
-import pydub
-
-
-class Location(Enum):
-    room_1 = ["ROOM ONE", "ROOM 1"]
-    room_2 = ["ROOM TWO", "ROOM 2"]
-    room_3 = ["ROOM THREE", "ROOM 3"]
 
 class Target(Enum):
     luke = 0
-    room_1 = 1
+    room = 1
 
 class Task(Enum):
     find = ["FIND", "FI ND", "IND"]
-    go_to = ["GO TO ROOM", "GO TWO ROOM", "GO TI ROOM"]
-    # check = ["CHECK"]
-    awake = ["SPOT", "SPO OT", "SPOOT"]
-    stop = ["STOP", "ST OP", "S TOP", "STO P"]
+    go_to = ["GO TO ROOM", "GO TWO ROOM", "GO TI ROOM", "GO ROOM"]
+    spot = ["SPOT", "SPO OT", "SPOOT"]
+    stop = ["STOP", "ST OP", "S TOP", "STO P", "BOUT", "SPOIT" "NO", "NOTHING", "ATHING"]
+    hello = ["HI", "EY", "HELLO", "ELLO", "HEY", "IY", "HELEN", "ALLO"]
 
 class Listen(Enum):
     response = 4
@@ -38,6 +29,10 @@ class Say():
 class SayImListening(Say):
   def __init__(self):
     super().__init__("Yes?", ["yes.wav", "huh.wav", "uhuh.wav", "yes_what_is_it.wav"], Listen.command)
+
+class SayHello(Say):
+   def __init__(self):
+    super().__init__("Hello!", ["hi.wav", "hello.wav"], Listen.awake)
 
 class SayImSearching(Say):
   def __init__(self):
@@ -69,7 +64,7 @@ class Sayings(Enum):
   ok_searching = SayImSearching()
   i_do_not_understand = SayIdoNotUnderstand()
   nothing = SayNothing()
-
+  hello = SayHello()
 
 class Command():
   def __init__(self, task: Task = None, target: Target = None, saying: Sayings = None):
@@ -88,16 +83,23 @@ class Command():
     say_pub.publish(self.saying.name)
     
 
+class Hello(Command):
+  def __init__(self):
+    super().__init__(Task.hello, saying=Sayings.hello)
+
+  def perform(self):
+    rospy.loginfo("HELLO")
+
 class FindLuke(Command):
   def __init__(self):
     super().__init__(Task.find, Target.luke, Sayings.ok_searching)
 
   def perform(self):
-    rospy.loginfo("PERFORMING FIND LUKE")
+    rospy.loginfo("PERFORMING FIND")
 
-class GoToRoom1(Command):
+class GoToRoom(Command):
   def __init__(self):
-    super().__init__(Task.go_to, Target.room_1, Sayings.ok_going)
+    super().__init__(Task.go_to, Target.room, Sayings.ok_going)
   
   def perform(self):
     rospy.loginfo("PERFORMING GO TO ROOM 1")
@@ -111,7 +113,8 @@ class Stop(Command):
 
 # TODO make custom ros msg instead of this enum facade that is using String. Make Command msg
 class Commands(Enum):
-  go_to_room_1 = GoToRoom1()
+  go_to_room_1 = GoToRoom()
   find_luke = FindLuke()
   stop = Stop()
+  hello = Hello()
 

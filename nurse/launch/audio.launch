@@ -15,7 +15,7 @@
     <arg name="demands_topic" default="listen" />
     <arg name="say_topic" default="say" />
     <arg name="audio_topic" default="audio" />
-    <arg name="translate_topic" default="audio/translate" />
+    <arg name="translate_topic" default="translate" />
     <arg name="translation_topic" default="translation" />
     <arg name="command_topic" default="command" />
     <arg name="response_topic" default="response" />
@@ -38,7 +38,6 @@
         <param name="demands_topic" value="$(arg demands_topic)"/>
 
         <param name="sample_rate" value="$(arg sample_rate)" />
-        <param name="translate_topic" value="$(arg translate_topic)" />
         <param name="audio_topic" value="$(arg audio_topic)" />
         <param name="listener_type" value="on_demand" />
         <param name="threshold_boost_multiplier" value="1.5" />        

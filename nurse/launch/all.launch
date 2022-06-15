@@ -4,6 +4,7 @@
     <arg name="command_topic" default="command" />
     <arg name="response_topic" default="response" />
     <arg name="translation_topic" default="translation" />
+    
 
     <!-- Launch Hardware -->
     <!-- <include file="$(find spot_driver)/launch/driver.launch"/> -->

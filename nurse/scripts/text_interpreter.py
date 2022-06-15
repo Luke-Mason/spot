@@ -67,7 +67,7 @@ class TextInterpreter():
     if self.listener_status == Listen.awake:
 
       # Check if it is the awake command
-      if self.check_task_matches(Task.awake, heard_words):
+      if self.check_task_matches(Task.spot, heard_words):
         self.say_pub.publish(Sayings.im_listening.name)
       
       return
