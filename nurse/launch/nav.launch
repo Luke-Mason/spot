@@ -1,3 +1,0 @@
-<launch>
-    <!-- <node pkg="nurse" name="Navigation" type="nav2.py" output="screen"/> -->
-</launch>
