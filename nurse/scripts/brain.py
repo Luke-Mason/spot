@@ -26,11 +26,11 @@ class Brain():
     command_sub = message_filters.Subscriber(command_topic, String)
     command_sub.registerCallback(self.recieved_command)
 
-  def recieved_command(self, command: String):
-    command: Command = Commands[command.data].value
+  def recieved_command(self, command_enum: String):
+    command: Command = Commands[command_enum.data].value
     command.run(self.say_pub)
 
-    if command.data == Commands.go_room.name:
+    if command_enum.data == Commands.go_room.name:
       self.send_to_goal()
 
   def recieved_response(self, response: String):

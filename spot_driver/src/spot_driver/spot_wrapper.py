@@ -666,7 +666,6 @@ class SpotWrapper():
         self._clear_graph()
         self._upload_graph_and_snapshots(upload_filepath)
         if initial_localization_fiducial:
-            self._logger.info("Found a fiducial\n\n\n")
             self._set_initial_localization_fiducial()
         
         # self._logger.info(self._list_graph_waypoint_and_edge_ids())   
