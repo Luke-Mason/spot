@@ -11,7 +11,7 @@ import time
 class Spot_Nav():
 
     def __init__(self):
-        rospy.init_node('send_goal')
+        pass
 
     # Callbacks definition
     def active_cb(self):
