@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (c) 2022 Boston Dynamics, Inc.  All rights reserved.
 #
 # Downloading, reproducing, distributing or otherwise using the SDK Software
@@ -22,7 +24,8 @@ from streamquality import StreamQualityCommands
 from utils import UtilityCommands
 from version import VersionCommands
 from webrtc import WebRTCCommands
-
+import rospy
+import time
 from bosdyn.client import spot_cam
 
 import urllib3
@@ -50,17 +53,27 @@ def register_all_commands(subparsers, command_dict):
 
 
 def main(args=None):
+    #print(args)
+
     """Command-line interface for interacting with Spot CAM"""
     parser = argparse.ArgumentParser(prog='bosdyn.api.spot_cam', description=main.__doc__)
     add_common_arguments(parser, credentials_no_warn=True)
+
 
     command_dict = {}  # command name to fn which takes parsed options
     subparsers = parser.add_subparsers(title='commands', dest='command')
     subparsers.required = True
 
     register_all_commands(subparsers, command_dict)
-
+    #print("Args")
+    #print(args)
     options = parser.parse_args(args=args)
+    #options = argparse.parser.ArgumentParser()
+    #options.add_argument(cam_ssl_cert=None, command='webrtc', count=0, dst_prefix='h264.sdp', hostname='192.168.80.3', password=None, sdp_filename='h264.sdp', sdp_port=31102, track='video', username=None, verbose=False, webrtc_command='save')
+
+
+    #print("Options")
+    #print(options)
 
     setup_logging(verbose=options.verbose)
 
@@ -79,4 +92,8 @@ def main(args=None):
 
 
 if __name__ == '__main__':
+    time.sleep(2)
+    rospy.init_node("Vision", log_level=rospy.INFO)
+    rospy.loginfo("STARTING Vision Service")
+
     main()

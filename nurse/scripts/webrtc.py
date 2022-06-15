@@ -367,7 +367,7 @@ class WebRTCSaveCommand(Command):
                                   help="Spot CAM's client cert path to check with Spot CAM server")
         self._parser.add_argument('--dst-prefix', default='h264.sdp',
                                   help='Filename prefix to prepend to all output data')
-        self._parser.add_argument('--count', type=int, default=1,
+        self._parser.add_argument('--count', type=int, default=0,
                                   help='Number of images to save. 0 to stream without saving.')
 
     def _run(self, robot, options):
@@ -468,6 +468,41 @@ def start_webrtc(shutdown_flag, options, process_func, recorder=None):
                    monitor_shutdown(shutdown_flag, client))
     loop.run_forever()
 
+def facial_recognition(face_img, stream_img):
+
+    face_locations = face_recognition.face_locations(face_img)
+
+    # Get the single face encoding out of elon-musk-1.jpg
+    face_location = face_locations[0]  # Only use the first detected face
+    face_encodings = face_recognition.face_encodings(face_img, [face_location])
+    person_face_encoding = face_encodings[0]  # Pull out the one returned face encoding
+
+
+    # Load the image with unknown to compare
+    #image = face_recognition.load_image_file("cover2.jpg")  # Load the image we are comparing
+    unknwon_face_encodings = face_recognition.face_encodings(stream_img)
+
+    # Loop over each unknwon face encoding to see if the face matches either known encodings
+    #print('Matches for elon-musk-in-group.jpg')
+    matches = []
+    for unknwon_face_encoding in unknwon_face_encodings:
+        matches.append(face_recognition.compare_faces(
+            [person_face_encoding],  # The known face encodings (can be only 1 - less is faster)
+            unknwon_face_encoding  # The single unknown face encoding
+        ))
+        #print(matches)
+
+    print(matches)
+    face_locations = face_recognition.face_locations(stream_img)
+    #print(face_locations)
+
+    for i in range(len(matches)):
+        if matches[i][0] == True:
+            print("Image found at location: " + str(face_locations[i]))
+            print()
+
+    # if found, take photo
+
 
 # Frame processing occurs; otherwise it waits.
 async def process_frame(client, options, shutdown_flag):
@@ -479,6 +514,7 @@ async def process_frame(client, options, shutdown_flag):
     print("yolo object created")
     # set start time to current time
     start_time = time.time()
+    print(start_time)
     # displays the frame rate every 2 second
     display_time = 2
     # Set primarry FPS to 0
@@ -505,42 +541,16 @@ async def process_frame(client, options, shutdown_flag):
                 #cv2.imshow("Web cam input", r_image)
 
 
+                if (time.time() - start_time) > 5:
 
-                known_image = face_recognition.load_image_file("images/dev.jpg")
-
-                face_locations = face_recognition.face_locations(known_image)
-
-                # Get the single face encoding out of elon-musk-1.jpg
-                face_location = face_locations[0]  # Only use the first detected face
-                face_encodings = face_recognition.face_encodings(known_image, [face_location])
-                elon_musk_knwon_face_encoding_1 = face_encodings[0]  # Pull out the one returned face encoding
+                    print("Time to recognize face")
 
 
-                # Load the image with unknown to compare
-                #image = face_recognition.load_image_file("cover2.jpg")  # Load the image we are comparing
-                unknwon_face_encodings = face_recognition.face_encodings(cv_image)
+                    face_img = face_recognition.load_image_file("/home/nishq/spot-ws/src/spot/nurse/scripts/images/dev.jpg")
 
-                # Loop over each unknwon face encoding to see if the face matches either known encodings
-                #print('Matches for elon-musk-in-group.jpg')
-                matches = []
-                for unknwon_face_encoding in unknwon_face_encodings:
-                    matches.append(face_recognition.compare_faces(
-                        [elon_musk_knwon_face_encoding_1],  # The known face encodings (can be only 1 - less is faster)
-                        unknwon_face_encoding  # The single unknown face encoding
-                    ))
-                    #print(matches)
+                    facial_recognition(face_img, cv_image)
 
-                print(matches)
-                face_locations = face_recognition.face_locations(cv_image)
-                print(face_locations)
-
-
-                for i in range(len(matches)):
-                    if matches[i][0] == True:
-                        print("Image found at location: " + str(face_locations[i]))
-                        print()
-
-                        
+                    start_time = time.time()
 
                 cv2.imshow('display', cv_image)
                 if cv2.waitKey(25) & 0xFF == ord("q"):
