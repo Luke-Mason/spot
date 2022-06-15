@@ -8,6 +8,7 @@ from std_msgs.msg import String
 from spot_msgs.msg import NavigateToGoal, NavigateToAction
 import actionlib
 import time
+import subprocess
 
 
 class Brain():
@@ -29,6 +30,12 @@ class Brain():
     command_sub.registerCallback(self.recieved_command)
 
     self.robot_status = 0
+
+  def spin_camera(self):
+
+    subprocess.run(["python3", "/home/nishq/spot-ws/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "ptz", "set_position", "mech", "240", "0", "0"])
+
+
 
   def recieved_command(self, command_enum: String):
     command: Command = Commands[command_enum.data].value
@@ -62,8 +69,9 @@ class Brain():
       self.status = status
       if status == 3:
           rospy.loginfo("\n\nGoal reached\n\n")
-          
-          
+
+          self.spin_camera()
+
           self.send_to_goal(self.navigate_to, self.initial_localization_waypoint, self.do_nothing)
           return "Done"
       if status == 2 or status == 8:
