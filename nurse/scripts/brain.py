@@ -17,8 +17,8 @@ class Brain():
     command_topic = rospy.get_param("~command_topic", "command")
     say_topic = rospy.get_param("~say_topic", "say")
     self.graph_upload_path = rospy.get_param("~graph_upload_path", "/home/rmitaiil/Desktop/map_folder/downloaded_graph")
-    self.initial_localization_waypoint = rospy.get_param("~initial_localization_waypoint", "")
-    self.navigate_to = rospy.get_param("~navigate_to", "")
+    self.initial_localization_waypoint = rospy.get_param("~initial_localization_waypoint", "nc")
+    self.navigate_to = rospy.get_param("~navigate_to", "rp")
 
     self.say_pub = rospy.Publisher("/" + say_topic, String, queue_size=1)
 
@@ -27,6 +27,8 @@ class Brain():
 
     command_sub = message_filters.Subscriber(command_topic, String)
     command_sub.registerCallback(self.recieved_command)
+
+    self.robot_status = 0
 
   def recieved_command(self, command_enum: String):
     command: Command = Commands[command_enum.data].value
@@ -44,9 +46,10 @@ class Brain():
       rospy.loginfo("Goal pose being processed")
 
   def feedback_cb(self,feedback):
-      rospy.loginfo("Current location: "+str(feedback))
+      rospy.loginfo("Current location: " + str(feedback))
 
   def done_cb(self, status, result):
+      self.status = status
       if status == 3:
           rospy.loginfo("\n\nGoal reached\n\n")
           return "Done"
@@ -74,6 +77,30 @@ class Brain():
       if not finished:
           rospy.logerr("Action server not available!")
           return
+      
+      rospy.loginfo (navclient.get_result())
+      rospy.loginfo("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+
+      if self.robot_status != 3:
+        rospy.loginfo("NOT CONTINUING")
+        return
+
+      rospy.loginfo("--------------------------------------------------------------")
+
+      # Creating the goal object
+      navigate_goal = NavigateToGoal()
+      navigate_goal.upload_path = self.graph_upload_path
+      navigate_goal.initial_localization_fiducial= False
+      navigate_goal.initial_localization_waypoint = self.navigate_to
+      navigate_goal.navigate_to = self.initial_localization_waypoint
+
+      # SENDING THE GOAL
+      navclient.send_goal(navigate_goal, self.done_cb, self.active_cb, self.feedback_cb)
+      finished = navclient.wait_for_result()
+
+      if not finished:
+        rospy.logerr("Action server not available!")
+        return
       
       rospy.loginfo (navclient.get_result())
 
