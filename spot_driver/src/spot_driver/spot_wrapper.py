@@ -4,6 +4,7 @@ import math
 from bosdyn.client import create_standard_sdk, ResponseError, RpcError
 from bosdyn.client.async_tasks import AsyncPeriodicQuery, AsyncTasks
 from bosdyn.geometry import EulerZXY
+from bosdyn.api.geometry_pb2 import Vec2, SE2Velocity, SE2VelocityLimit
 
 from bosdyn.client.robot_state import RobotStateClient
 from bosdyn.client.robot_command import RobotCommandClient, RobotCommandBuilder
@@ -665,10 +666,16 @@ class SpotWrapper():
         self._clear_graph()
         self._upload_graph_and_snapshots(upload_filepath)
         if initial_localization_fiducial:
+            self._logger.info("Found a fiducial\n\n\n")
             self._set_initial_localization_fiducial()
+        
+        # self._logger.info(self._list_graph_waypoint_and_edge_ids())   
         if initial_localization_waypoint:
+            print("Found a waypoint",initial_localization_waypoint,"\n\n\n")
             self._set_initial_localization_waypoint([initial_localization_waypoint])
-        self._list_graph_waypoint_and_edge_ids()
+        
+        # self._logger.error("I am empty\n\n\n")
+        self._logger.info(self._list_graph_waypoint_and_edge_ids())
         self._get_localization_state()
         resp = self._navigate_to([navigate_to])
 
@@ -690,8 +697,7 @@ class SpotWrapper():
         # Create an empty instance for initial localization since we are asking it to localize
         # based on the nearest fiducial.
         localization = nav_pb2.Localization()
-        self._graph_nav_client.set_localization(initial_guess_localization=localization,
-                                                ko_tform_body=current_odom_tform_body)
+        self._graph_nav_client.set_localization(initial_guess_localization=localization,ko_tform_body=current_odom_tform_body)
 
     def _set_initial_localization_waypoint(self, *args):
         """Trigger localization to a waypoint."""
@@ -700,8 +706,10 @@ class SpotWrapper():
             # If no waypoint id is given as input, then return without initializing.
             self._logger.error("No waypoint specified to initialize to.")
             return
+       
         destination_waypoint = graph_nav_util.find_unique_waypoint_id(
             args[0][0], self._current_graph, self._current_annotation_name_to_wp_id, self._logger)
+        
         if not destination_waypoint:
             # Failed to find the unique waypoint id.
             return
@@ -734,8 +742,7 @@ class SpotWrapper():
         localization_id = self._graph_nav_client.get_localization_state().localization.waypoint_id
 
         # Update and print waypoints and edges
-        self._current_annotation_name_to_wp_id, self._current_edges = graph_nav_util.update_waypoints_and_edges(
-            graph, localization_id, self._logger)
+        self._current_annotation_name_to_wp_id, self._current_edges = graph_nav_util.update_waypoints_and_edges(graph, localization_id, self._logger)
         return self._current_annotation_name_to_wp_id, self._current_edges
 
 
@@ -781,9 +788,9 @@ class SpotWrapper():
         localization_state = self._graph_nav_client.get_localization_state()
         if not localization_state.localization.waypoint_id:
             # The robot is not localized to the newly uploaded graph.
-            self._logger.info(
-                   "Upload complete! The robot is currently not localized to the map; please localize", \
-                   "the robot using commands (2) or (3) before attempting a navigation command.")
+            self._logger.info("Upload complete! The robot is currently not localized to the map; please localize the robot using commands (2) or (3) before attempting a navigation command.")
+
+        
 
     def _navigate_to(self, *args):
         """Navigate to a specific waypoint."""
@@ -808,14 +815,21 @@ class SpotWrapper():
         sublease = self._lease.create_sublease()
         self._lease_keepalive.shutdown()
 
+        # Setting the velocity limit
+        linear_values = Vec2(x=0.5,y=0.5)
+        velocity_values = SE2Velocity(linear=linear_values,angular=0.3)
+        max_velocity_limit = SE2VelocityLimit(max_vel = velocity_values)
+
+
         # Navigate to the destination waypoint.
         is_finished = False
         nav_to_cmd_id = -1
         while not is_finished:
             # Issue the navigation command about twice a second such that it is easy to terminate the
             # navigation command (with estop or killing the program).
-            nav_to_cmd_id = self._graph_nav_client.navigate_to(destination_waypoint, 1.0,
-                                                               leases=[sublease.lease_proto])
+            nav_to_cmd_id = self._graph_nav_client.navigate_to(destination_waypoint, 2.0,
+                                                               leases=[sublease.lease_proto],
+                                                               travel_params=self._graph_nav_client.generate_travel_params(100,100,max_velocity_limit))
             time.sleep(.5)  # Sleep for half a second to allow for command execution.
             # Poll the robot for feedback to determine if the navigation command is complete. Then sit
             # the robot down once it is finished.
