@@ -8,10 +8,10 @@ class Target(Enum):
 
 class Task(Enum):
     find = ["FIND", "FI ND", "IND"]
-    go_to = ["GO TO ROOM", "GO TWO ROOM", "GO TI ROOM", "GO ROOM"]
+    go_to = ["GO ROOM", "GO RUM", "GO RUME"]
     spot = ["SPOT", "SPO OT", "SPOOT"]
     stop = ["STOP", "ST OP", "S TOP", "STO P", "BOUT", "SPOIT" "NO", "NOTHING", "ATHING"]
-    hello = ["HI", "EY", "HELLO", "ELLO", "HEY", "IY", "HELEN", "ALLO"]
+    hello = ["HELLO", "ELLO", "HEY", "IY", "HELEN", "ALLO"]
 
 class Listen(Enum):
     response = 4
@@ -80,8 +80,8 @@ class Command():
     pass
 
   def run(self, say_pub: rospy.Publisher):
-    self.perform()
     say_pub.publish(self.saying.name)
+    self.perform()
     
 
 class Hello(Command):
