@@ -17,6 +17,8 @@ class Brain():
     command_topic = rospy.get_param("~command_topic", "command")
     say_topic = rospy.get_param("~say_topic", "say")
     self.graph_upload_path = rospy.get_param("~graph_upload_path", "/home/rmitaiil/Desktop/map_folder/downloaded_graph")
+    self.initial_localization_waypoint = rospy.get_param("~initial_localization_waypoint", "")
+    self.navigate_to = rospy.get_param("~navigate_to", "")
 
     self.say_pub = rospy.Publisher("/" + say_topic, String, queue_size=1)
 
@@ -61,9 +63,9 @@ class Brain():
       # Creating the goal object
       navigate_goal = NavigateToGoal()
       navigate_goal.upload_path = self.graph_upload_path
-      navigate_goal.navigate_to = "fc"
       navigate_goal.initial_localization_fiducial= False
-      navigate_goal.initial_localization_waypoint = "ka"
+      navigate_goal.initial_localization_waypoint = self.initial_localization_waypoint
+      navigate_goal.navigate_to = self.navigate_to
 
       # SENDING THE GOAL
       navclient.send_goal(navigate_goal, self.done_cb, self.active_cb, self.feedback_cb)
