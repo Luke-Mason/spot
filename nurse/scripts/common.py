@@ -16,7 +16,7 @@ class Target(Enum):
 
 class Task(Enum):
     find = ["FIND", "FI ND", "IND"]
-    go_to = ["GO", "GOO", "G OO", "G O"]
+    go_to = ["GO TO ROOM", "GO TWO ROOM", "GO TI ROOM"]
     # check = ["CHECK"]
     awake = ["SPOT", "SPO OT", "SPOOT"]
     stop = ["STOP", "ST OP", "S TOP", "STO P"]
@@ -33,36 +33,8 @@ class Say():
     self.audio_files = audio_files
     self.listen = listen
 
-  def get_listen(self):
-    return self.listen
 
-  def run(self, path_to_media: str, listen_pub: rospy.Publisher, prev_listen_status: Listen, spot_enabled: bool):
-    if len(self.audio_files) > 0:
-      num = random.randint(0, len(self.audio_files) - 1)
-      path = path_to_media + "/" + str(self.audio_files[num])
-
-      # Pause the microphone listeners
-      listen_pub.publish(Listen.paused.name)
-
-      if spot_enabled:
-        pass
-        # play_sound()
-      else:
-        sound = pydub.AudioSegment.from_wav(path)
-        playback = sa.play_buffer(
-            sound.raw_data, 
-            num_channels=sound.channels, 
-            bytes_per_sample=sound.sample_width, 
-            sample_rate=sound.frame_rate
-            )
-        playback.wait_done()
-
-      # Sleep because listener heard the last bit of audio and caused infinite loop of it talking to itself.
-      rospy.timer.sleep(0.5)
-
-      # Continue listening
-      listen_pub.publish(prev_listen_status.name if self.listen is None else self.listen.name)
-
+# TODO Make these classes from a config file
 class SayImListening(Say):
   def __init__(self):
     super().__init__("Yes?", ["yes.wav", "huh.wav", "uhuh.wav", "yes_what_is_it.wav"], Listen.command)

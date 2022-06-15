@@ -67,7 +67,6 @@ if __name__ == '__main__':
     # id_client = robot.get_cached_robot_id()
     # rospy.loginfo(id_client)
 
-    audio_client: AudioClient = robot.ensure_client("spot-cam-audio")
 
     # channel: grpc.Channel = audio_client.get_audio_capture_channel()
     # channel.stream_stream()
@@ -77,7 +76,7 @@ if __name__ == '__main__':
     #     pass
 
     # def handle_audio_error_from_response(response):
-        return None
+        # return None
 
     # request = audio_pb2.GetAudioCaptureChannelRequest()
     # response: grpc.StreamStreamMultiCallable = AudioClient.call(AudioGetAudioCaptureChannel(), request,
@@ -125,15 +124,9 @@ if __name__ == '__main__':
     # audio_client = robot.ensure_client()
     # time.sleep(3)
     # rospy.loginfo(robot.list_services())
+    
 
-    # path_to_file = "../workspace/aiil_workspace/noetic_workspace/src/spot/nurse/media/i_did_not_catch_that.wav"
-    # sound = audio_pb2.Sound(name="hello")
-    # with open(path_to_file, 'rb') as fh:
-    #     data = fh.read()
-    # audio_client.load_sound(sound, data)
-
-    # sound = audio_pb2.Sound(name="hello")
-    # audio_client.play_sound(sound, 3)
+    
 
     # rospy.loginfo(json.dump(lease_client.list_leases()))
     # rospy.loginfo(json.dump(state_client.get_robot_state()))
