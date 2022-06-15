@@ -7,43 +7,52 @@ from std_msgs.msg import Header
 import actionlib
 import time
 
-# Callbacks definition
 
-def active_cb():
-    rospy.loginfo("Goal pose being processed")
+class Spot_Nav():
 
-def feedback_cb(feedback):
-    rospy.loginfo("Current location: "+str(feedback))
+    def __init__(self):
+        rospy.init_node('send_goal')
 
-def done_cb(status, result):
-    if status == 3:
-        rospy.loginfo("\n\nGoal reached\n\n")
-    if status == 2 or status == 8:
-        rospy.loginfo("Goal cancelled")
-    if status == 4:
-        rospy.loginfo("Goal aborted")
-    
+    # Callbacks definition
+    def active_cb(self):
+        rospy.loginfo("Goal pose being processed")
 
-rospy.init_node('send_goal')
+    def feedback_cb(self,feedback):
+        rospy.loginfo("Current location: "+str(feedback))
 
-navclient = actionlib.SimpleActionClient('/spot/navigate_to', NavigateToAction)
-navclient.wait_for_server()
+    def done_cb(self, status, result):
+        if status == 3:
+            rospy.loginfo("\n\nGoal reached\n\n")
+            return "Done"
+        if status == 2 or status == 8:
+            rospy.loginfo("Goal cancelled")
+        if status == 4:
+            rospy.loginfo("Goal aborted")
 
-# CREATING THE GOAL
 
-# Creating the NavigateToGoal object
-navigate_goal = NavigateToGoal()
-navigate_goal.upload_path = "/home/ramji/Desktop/map_folder/downloaded_graph"
-navigate_goal.navigate_to = "um"
-navigate_goal.initial_localization_fiducial= False
-navigate_goal.initial_localization_waypoint = "ur"
+    def send_to_goal(self):
+        # Connecting to the nav client server.
+        navclient = actionlib.SimpleActionClient('/spot/navigate_to', NavigateToAction)
+        navclient.wait_for_server()
 
-# SENDING THE GOAL
+        # Creating the goal object
+        navigate_goal = NavigateToGoal()
+        navigate_goal.upload_path = "/home/ramji/Desktop/map_folder/downloaded_graph"
+        navigate_goal.navigate_to = "hm"
+        navigate_goal.initial_localization_fiducial= False
+        navigate_goal.initial_localization_waypoint = "tb"
 
-navclient.send_goal(navigate_goal, done_cb, active_cb, feedback_cb)
-finished = navclient.wait_for_result()
+        # SENDING THE GOAL
 
-if not finished:
-    rospy.logerr("Action server not available!")
-else:
-    rospy.loginfo (navclient.get_result())
+        navclient.send_goal(navigate_goal, self.done_cb, self.active_cb, self.feedback_cb)
+        finished = navclient.wait_for_result()
+
+        if not finished:
+            rospy.logerr("Action server not available!")
+        else:
+            rospy.loginfo (navclient.get_result())
+
+
+if __name__=="__main__":
+    nav = Spot_Nav()
+    nav.send_to_goal()

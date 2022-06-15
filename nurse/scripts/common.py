@@ -1,5 +1,6 @@
 from enum import Enum
 import rospy
+from nav2 import Spot_Nav
 
 class Target(Enum):
     luke = 0
@@ -103,6 +104,9 @@ class GoToRoom(Command):
   
   def perform(self):
     rospy.loginfo("PERFORMING GO TO ROOM 1")
+    nav = Spot_Nav()
+    nav.send_to_goal()
+
 
 class Stop(Command):
   def __init__(self):
