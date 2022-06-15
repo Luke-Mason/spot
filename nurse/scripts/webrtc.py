@@ -541,7 +541,7 @@ async def process_frame(client, options, shutdown_flag):
                 #cv2.imshow("Web cam input", r_image)
 
 
-                if (time.time() - start_time) > 5:
+                if (time.time() - start_time) > 3:
 
                     print("Time to recognize face")
 
