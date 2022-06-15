@@ -3,7 +3,7 @@
     <arg name="say_topic" default="say" />
     <arg name="path_to_media" default="spot/nurse/media" />
     <arg name="spot_enabled" default="True" />
-    <arg name="audio_gain" default="0" />
+    <arg name="audio_gain" default="10" />
 
 
     <node pkg="nurse" name="VoicePlayer" type="voice_player.py" output="screen">

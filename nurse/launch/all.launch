@@ -21,7 +21,8 @@
     <include file="$(find nurse)/launch/voice.launch" >
         <arg name="demands_topic" value="$(arg demands_topic)"/>  
         <arg name="say_topic" value="$(arg say_topic)" />
-        <arg name="path_to_media" value="/home/nishq/spot-ws/src/spot/nurse/media" />
+        <!-- <arg name="path_to_media" value="/home/nishq/spot-ws/src/spot/nurse/media" /> -->
+        <arg name="path_to_media" value="../workspace/aiil_workspace/noetic_workspace/src/spot/nurse/media/" />
         <!-- <arg name="path_to_media" value="../catkin_ws/src/nurse/media" /> -->
     </include>
 

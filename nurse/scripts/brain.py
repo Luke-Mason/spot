@@ -33,7 +33,7 @@ class Brain():
 
   def spin_camera(self):
 
-    subprocess.run(["python3", "/home/nishq/spot-ws/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "ptz", "set_position", "mech", "240", "0", "0"])
+    subprocess.run(["python3", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "ptz", "set_position", "mech", "240", "0", "0"])
 
 
 

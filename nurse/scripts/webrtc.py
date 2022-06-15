@@ -546,7 +546,7 @@ async def process_frame(client, options, shutdown_flag):
                     print("Time to recognize face")
 
 
-                    face_img = face_recognition.load_image_file("/home/nishq/spot-ws/src/spot/nurse/scripts/images/dev.jpg")
+                    face_img = face_recognition.load_image_file("/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/images/dev.jpg")
 
                     facial_recognition(face_img, cv_image)
 
