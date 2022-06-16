@@ -33,7 +33,10 @@ class Brain():
 
   def spin_camera(self):
 
-    subprocess.run(["python3", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "ptz", "set_position", "mech", "240", "0", "0"])
+
+    for i in range(0,360,3):
+
+      subprocess.run(["python3", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "ptz", "set_position", "mech", str(i), "0", "0"])
 
 
 
@@ -69,7 +72,8 @@ class Brain():
       self.status = status
       if status == 3:
           rospy.loginfo("\n\nGoal reached\n\n")
-          subprocess.run(["python3", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "webrtc", "save", "--count", "0"])
+          subprocess.run(["roslaunch", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/launch/vision.launch"])
+          #subprocess.run(["python3", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "webrtc", "save", "--count", "0"])
           rospy.loginfo(time.time())
           self.spin_camera()
           rospy.loginfo(time.time())
