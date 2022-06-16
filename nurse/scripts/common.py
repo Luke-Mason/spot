@@ -2,7 +2,7 @@ from enum import Enum
 import rospy
 
 class Target(Enum):
-    luke = 0
+    person = 0
     room = 1
 
 class Task(Enum):
@@ -90,9 +90,9 @@ class Hello(Command):
   def perform(self):
     rospy.loginfo("HELLO")
 
-class FindLuke(Command):
+class Find(Command):
   def __init__(self):
-    super().__init__(Task.find, Target.luke, Sayings.ok_searching)
+    super().__init__(Task.find, Target.person, Sayings.ok_searching)
 
   def perform(self):
     rospy.loginfo("PERFORMING FIND")
@@ -115,7 +115,7 @@ class Stop(Command):
 # TODO make custom ros msg instead of this enum facade that is using String. Make Command msg
 class Commands(Enum):
   go_room = GoToRoom()
-  find_luke = FindLuke()
+  find = Find()
   stop = Stop()
   hello = Hello()
 

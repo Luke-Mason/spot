@@ -47,6 +47,9 @@ class Brain():
     if command_enum.data == Commands.go_room.name:
       self.send_to_goal(self.initial_localization_waypoint, self.navigate_to, self.done_cb)
 
+    if command_enum.data == Commands.find:
+      self.spin_camera()
+
   def recieved_response(self, response: String):
     # self.say_pub.publish(Response[response.data].value.get_say().name)
     rospy.loginfo("recieved response")
