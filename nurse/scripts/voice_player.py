@@ -64,6 +64,8 @@ class VoicePlayer():
       if self.spot_enabled:
         sound = audio_pb2.Sound(name=file)
         self.audio_client.play_sound(sound, self.audio_gain)
+        rospy.timer.sleep(1.5)
+
       else:
         sound = pydub.AudioSegment.from_wav(path)
         playback = sa.play_buffer(
@@ -73,9 +75,11 @@ class VoicePlayer():
             sample_rate=sound.frame_rate
             )
         playback.wait_done()
+        rospy.timer.sleep(0.5)
+
+
 
       # Sleep because listener heard the last bit of audio and caused infinite loop of it talking to itself.
-      rospy.timer.sleep(0.5)
 
       # Continue listening
       self.demands_pub.publish(self.prev_listen_status.name if say.listen is None else say.listen.name)

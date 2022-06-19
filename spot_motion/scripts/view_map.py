@@ -335,7 +335,7 @@ def create_anchored_graph_objects(current_graph, current_waypoint_snapshots, cur
     return avg_pos
 
 
-def create_graph_objects(current_graph, current_waypoint_snapshots, current_waypoints, renderer):
+def create_graph_objects(current_graph, current_waypoint_snapshots, current_waypoints, renderer,name="Patient X",dist=0.2):
     """
     Creates all the VTK objects associated with the graph.
     :param current_graph: the graph to use.
@@ -386,7 +386,11 @@ def create_graph_objects(current_graph, current_waypoint_snapshots, current_wayp
                     world_tform_fiducial = np.dot(world_tform_current_waypoint,
                                                   vtk_to_mat(curr_wp_tform_fiducial))
                     fiducial_object.SetUserTransform(mat_to_vtk(world_tform_fiducial))
-                    make_text(str(fiducial.apriltag_properties.tag_id), world_tform_fiducial[:3, 3],
+
+                    # make_text(str(fiducial.apriltag_properties.tag_id), world_tform_fiducial[:3, 3],
+                    #           renderer)
+
+                    make_text(name, world_tform_fiducial[:3, 3]+dist,
                               renderer)
 
         # Now, for each edge, walk along the edge and concatenate the transform to the neighbor.
