@@ -33,6 +33,7 @@ class Brain():
 
   def spin_camera(self):
     for i in range(0,360,15):
+      #TODO make this path configurable, it is hardcoded
       subprocess.run(["python3", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "ptz", "set_position", "mech", str(i), "0", "0"])
 
 

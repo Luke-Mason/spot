@@ -2,7 +2,7 @@
     <arg name="demands_topic" default="listen" />
     <arg name="say_topic" default="say" />
     <arg name="path_to_media" default="spot/nurse/media" />
-    <arg name="spot_enabled" default="True" />
+    <arg name="spot_enabled" default="False" />
     <arg name="audio_gain" default="5" />
 
 
