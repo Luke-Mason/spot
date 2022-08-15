@@ -20,7 +20,7 @@ from aiortc import (
 )
 from aiortc.contrib.media import MediaRecorder
 import requests
-
+import rospy
 import cv2
 import numpy as np
 
@@ -220,10 +220,9 @@ def facial_recognition(face_img, stream_img):
     for i in range(len(matches)):
         if matches[i][0] == True:
 
-            subprocess.run(["seq", "2", "|", "xargs", "-I{}", "python3", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "media_log",  "store_retrieve" ,"pano"])
+            subprocess.run(["seq", "2", "|", "xargs", "-I", "python3", "/home/rmitaiil/workspace/aiil_workspace/noetic_workspace/src/spot/nurse/scripts/command_line.py", "192.168.80.3", "media_log",  "store_retrieve" ,"pano"])
             # seq 10 | xargs -I{} python -m command_line 192.168.80.3 media_log store_retrieve pano
-            print("Image found at location: " + str(face_locations[i]))
-            print()
+            rospy.loginfo("-------------------------------------- \n\n\n Person found at location: " + str(face_locations[i]) + "\n\n\n\n\n--------------------------------------")
 
     # if found, take photo
 
